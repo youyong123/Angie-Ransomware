@@ -1,0 +1,42 @@
+{
+  "configurations": [
+    {
+      "inheritEnvironments": [
+        "msvc_x86"
+      ],
+      "name": "x86",
+      "forcedInclude": [
+        "${workspaceRoot}\\include\\stdafx.h"
+      ],
+      "includePath": [
+        "${workspaceRoot}\\include\\**",
+        "${env.INCLUDE}"
+      ],
+      "defines": [
+        "DEBUG",
+        "DEBUG_LEVEL=3",
+        "DEBUG_C_ASSERT"
+      ],
+      "intelliSenseMode": "windows-msvc-x86"
+    },
+    {
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "name": "x64",
+      "forcedInclude": [
+        "${workspaceRoot}\\include\\stdafx.h"
+      ],
+      "includePath": [
+        "${workspaceRoot}\\include\\**",
+        "${env.INCLUDE}"
+      ],
+      "defines": [
+        "DEBUG",
+        "DEBUG_LEVEL=3",
+        "DEBUG_C_ASSERT"
+      ],
+      "intelliSenseMode": "windows-msvc-x86"
+    }
+  ]
+}
