@@ -3,9 +3,6 @@
 
 /*
     "patched" windows.h wannabe header that removes all beta features and gives steroids on weak types and defines
-
-    Windows internal structures starting with "$" are compatible from windows 7 to the newest, "$" is to not conflict
-    with the current DDK structures.
 */
 
 #define _WIN32_WINNT  0x0601
