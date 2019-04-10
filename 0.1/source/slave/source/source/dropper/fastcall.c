@@ -1,6 +1,17 @@
 #include <config.h>
 #include <fastcall.h>
 
+VOID
+FASTCALLSTUB
+KiFastSystemCall(VOID)
+{
+    __asm {
+        mov edx, esp
+        sysenter
+        ret
+    };
+}
+
 // TODO: Test
 //ULONG64
 //KiJumpLongMode(
@@ -34,39 +45,27 @@
 //    }
 //}
 
-VOID
-FASTCALLSTUB
-KiFastSystemCall(void)
-{
-    __asm {
-        mov edx, esp
-        sysenter
-        ret
-    };
-}
-
-#if 0
-    VOID
-    FASTCALLSTUB
-    KiFastSystemCall64(void)
-    {
-        enum {
-            SystemCallOffset = FIELD_OFFSET(USER_SHARED_DATA, Syscall)
-        }
-
-        __asm {
-            _emit 0x4C
-            _emit 0x8B
-            _emit 0xD1
-            test byte ptr [USER_SHARED_DATA + SystemCallOffset], TRUE
-            jne L1
-            syscall
-            ret
-        L1:
-            int 0x2E
-            ret
-        };
-    }
-#endif
-
-
+//
+//#if 0
+//    VOID
+//    FASTCALLSTUB
+//    KiFastSystemCall64(void)
+//    {
+//        enum {
+//            SystemCallOffset = FIELD_OFFSET(USER_SHARED_DATA, Syscall)
+//        }
+//
+//        __asm {
+//            _emit 0x4C
+//            _emit 0x8B
+//            _emit 0xD1
+//            test byte ptr [USER_SHARED_DATA + SystemCallOffset], TRUE
+//            jne L1
+//            syscall
+//            ret
+//        L1:
+//            int 0x2E
+//            ret
+//        };
+//    }
+//#endif

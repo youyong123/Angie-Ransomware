@@ -77,4 +77,52 @@ RtlpGetPeb(VOID)
     #endif
 }
 
+static
+PRTL_USER_PROCESS_PARAMETERS32
+FORCEINLINE
+RtlpGetUserProcessParameters32(VOID)
+{
+    return (PRTL_USER_PROCESS_PARAMETERS32)RtlpGetPeb32()->ProcessParameters;
+}
+
+static
+PRTL_USER_PROCESS_PARAMETERS64
+FORCEINLINE
+RtlpGetUserProcessParameters64(VOID)
+{
+    return (PRTL_USER_PROCESS_PARAMETERS64)RtlpGetPeb64()->ProcessParameters;
+}
+
+static
+PRTL_USER_PROCESS_PARAMETERS
+FORCEINLINE
+RtlpGetUserProcessParameters(VOID)
+{
+    #ifdef _AMD64_
+        return (PRTL_USER_PROCESS_PARAMETERS)RtlpGetUserProcessParameters64();
+    #else
+        return (PRTL_USER_PROCESS_PARAMETERS)RtlpGetUserProcessParameters32();
+    #endif
+}
+
+static
+BOOLEAN
+FORCEINLINE
+RtlpIsProcessorFeaturePresent(
+    IN ULONG dwFeatureId
+    )
+{
+    return RtlpUserShared()->ProcessorFeatures[dwFeatureId];
+}
+
+static
+WORD
+FORCEINLINE
+RtlpIsProcessRunningUnderWow64(VOID)
+{
+    __asm {
+        mov ax, gs
+    };
+}
+
 #endif

@@ -41,7 +41,6 @@ typedef union _CONFIG {
         } NtVersion;
 
         struct {
-            DWORD dwWow64CallOffset;
             WORD  wLongModeSelector;
             WORD  wLegacyModeSelector;
         } Os;
@@ -51,6 +50,7 @@ typedef union _CONFIG {
 extern CONFIG Config;
 
 BOOL
+DECLSPEC_NOINLINE
 InitConfig(VOID);
 
 #endif

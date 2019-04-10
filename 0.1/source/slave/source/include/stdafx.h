@@ -10,6 +10,7 @@
 #pragma warning(disable:537 ) // declaring a void parameter list with a typedef is nonstandard
 #pragma warning(disable:137 ) // expression must be a modifiable lvalue)
 #pragma warning(disable:1899) // multicharacter character literal (potential portability problem)
+#pragma warning(disable:69  ) // integer conversion resulted in truncation
 
 typedef enum _NTVERSION {
     NTVERSION_WIN10_1809_MJ  = 10,
@@ -52,8 +53,6 @@ typedef enum _NTVERSION {
 #define ON  1
 #define OFF 0
 
-#include  "..\..\..\globalconfig.h"
-
 /* Max version that we will run */
 #define SCFG_NTVESRION_MAX_MJ            (NTVERSION_WIN10_1809_MJ + 1)
 #define SCFG_NTVESRION_MAX_MN            (NTVERSION_WIN10_1809_MN + 1)
@@ -69,19 +68,24 @@ typedef enum _NTVERSION {
 #define SCFG_NTVERSION_DEPRECATED_MI_MN  NTVERSION_WIN10_1809_MN
 #define SCFG_NTVERSION_DEPRECATED_MI_BNO NTVERSION_WIN10_1809_BNO
 
-#define SCFG_DLOG_DROPPER_THREAD0_DOS L"\\Device\\NamedPipe\\{49E0CB71-B6D5-4501-A508-E7770725CF55}"
 #define SCFG_DLOG_LARGEST_PROC_NAME   30
+#define SCFG_DLOG_DROPPER_THREAD0_DOS L"\\Device\\NamedPipe\\{49E0CB71-B6D5-4501-A508-E7770725CF55}"
 
-#define SCFG_IGNORE_HARDWARE_DBG ON // OFF
-#define SCFG_IGNORE_SOFTWARE_DBG ON // OFF
-#define SCFG_IGNORE_SAFEBOOT     ON // OFF
+#pragma region DROPPER
+    #define SCFG_DROPPER_LDR_PRINT_FOUND_PROC    OFF // OFF
 
-#define SCFG_NTAPI_INIT_USE_PROCLOAD  ON // OFF
-#define SCFG_RANDOM_FORCE_RDRAND      OFF // OFF
-#define SCFG_RANDOM_FORCE_NON_RDRAND  OFF // OFF
+    #define SCFG_DROPPER_NTAPI_INIT_USE_PROCLOAD OFF // OFF
+    #define SCFG_DROPPER_NTAPI_INIT_USE_SYSCALLS OFF // OFF
+
+    #define SCFG_DROPPER_IGNORE_HARDWARE_DBG     ON  // OFF
+    #define SCFG_DROPPER_IGNORE_SOFTWARE_DBG     ON  // OFF
+    #define SCFG_DROPPER_IGNORE_SAFEBOOT         ON  // OFF
+    
+    #define SCFG_DROPPER_INSTANCE_IGNORE_OTHER   OFF // OFF
+    #define SCFG_DROPPER_INSTANCE_USE_SEED_SALT  ON  // ON
+#pragma endregion
 
 #include <winsdk.h>
 #include <simdsdk.h>
 #include <dlog.h>
 #include <rtlp.h>
-

@@ -8,12 +8,6 @@
 
 VOID
 FASTCALLSTUB
-KiFastSystemCall(void);
-
-#if 0
-    VOID
-    FASTCALLSTUB
-    KiFastSystemCall64(void);
-#endif
+KiFastSystemCall(VOID);
 
 #endif

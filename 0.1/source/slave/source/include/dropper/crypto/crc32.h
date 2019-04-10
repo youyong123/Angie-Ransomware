@@ -32,7 +32,7 @@ InitCrc32(VOID)
 
     Crc32SumBuffer = Config.Features.bSSE5 ? FastCrc32SumBuffer : SlowCrc32SumBuffer;
 
-    $DLOG1(DLG_FLT_INFO, "Done!");
+    $DLOG1(DLG_FLT_INFO, "Done");
 }
 
 #endif

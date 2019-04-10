@@ -1,4 +1,3 @@
-#include <ntapi.h>
 #include <module.h>
 
 BOOL

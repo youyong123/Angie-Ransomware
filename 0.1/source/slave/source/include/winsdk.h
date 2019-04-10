@@ -3,9 +3,6 @@
 
 /*
     "patched" windows.h wannabe header that removes all beta features and gives steroids on weak types and defines
-
-    Windows internal structures starting with "$" are compatible from windows 7 to the newest, "$" is to not conflict
-    with the current DDK structures.
 */
 
 #define _WIN32_WINNT  0x0601
@@ -26,11 +23,13 @@
 #define PRAGMA_LOOP_UNROLL_N(X)        __pragma(unroll(X))
 #define PRAGMA_OPTIMIZATION_LEVEL(X)   __pragma(intel optimization_level X)
 #define PRAGMA_MESSAGE(X)              __pragma(message(X))
+#define PRAGMA_NOINLINE                __pragma(noinline)
 
 #define DECLSPEC_NAKED                 __declspec(naked)
 #define DECLSPEC_NOINLINE              __declspec(noinline)
 #define DECLSPEC_NORETURN              __declspec(noreturn)
 #define DECLSPEC_DEPRECATED            __declspec(deprecated)
+#define DECLSPEC_DEPRECATED_S(X)       __declspec(deprecated(X))
 #define DECLSPEC_ALIGN_8               __declspec(align(8))
 #define DECLSPEC_ALIGN_16              __declspec(align(16))
 #define DECLSPEC_ALIGN(X)              __declspec(align(X))
@@ -51,9 +50,9 @@
 #include <winbase.h>
 #include <no_sal2.h>
 
-#define IO  // in/out
-#define NON // not used
-#define OPT // optional
+#define IO
+#define NON
+#define OPT
 
 #undef VOID
 #undef NULL
@@ -63,16 +62,16 @@
 typedef void VOID;
 typedef const void CVOID;
 
+#define __TOTEXT(X) #X
+#define TOTEXT(X)   __TOTEXT(X)
+
 #ifndef DEBUG
     #undef DBG_UNREFERENCED_PARAMETER(P)
     #undef DBG_UNREFERENCED_LOCAL_VARIABLE(V)
 
-    #define DBG_UNREFERENCED_PARAMETER(P)
-    #define DBG_UNREFERENCED_LOCAL_VARIABLE(V)
+    #define DBG_UNREFERENCED_PARAMETER(P)       PRAGMA_MESSAGE("DBG_UNREFERENCED_PARAMETER - " TOTEXT(X))
+    #define DBG_UNREFERENCED_LOCAL_VARIABLE(V)  PRAGMA_MESSAGE("DBG_UNREFERENCED_LOCAL_VARIABLE - " TOTEXT(X))
 #endif
-
-#define __TOTEXT(X) #X
-#define TOTEXT(X)   __TOTEXT(X)
 
 #define SIGNED    signed
 #define UNSIGNED  unsigned
@@ -157,12 +156,25 @@ DECLARE_HANDLE(HTRHEAD);
 #define NtCurrentProcess() ((HANDLE)(LONG_PTR)-1)
 #define NtCurrentThread()  ((HANDLE)(LONG_PTR)-2)
 
+#define APPLICATION_ERROR_MASK       0x20000000
+#define ERROR_SEVERITY_SUCCESS       0x00000000
+#define ERROR_SEVERITY_INFORMATIONAL 0x40000000
+#define ERROR_SEVERITY_WARNING       0x80000000
+#define ERROR_SEVERITY_ERROR         0xC0000000
+
 typedef LONG NTSTATUS, *PNTSTATUS;
 
-#define NT_SUCCESS(Status)     (((NTSTATUS)(Status)) >= 0)
-#define NT_INFORMATION(Status) ((((ULONG)(Status)) >> 30) == 1)
-#define NT_WARNING(Status)     ((((ULONG)(Status)) >> 30) == 2)
-#define NT_ERROR(Status)       ((((ULONG)(Status)) >> 30) == 3)
+#define NT_SUCCESS(Status) (((NTSTATUS)(Status)) >= 0)
+
+#if 0
+    #define NT_INFORMATION(Status) (((NTSTATUS)(Status)) >= (LONG )0x40000000)
+    #define NT_WARNING(Status)     (((NTSTATUS)(Status)) <  (LONG )0xC0000000)
+    #define NT_ERROR(Status)       (((NTSTATUS)(Status)) >= (ULONG)0xC0000000)
+#else
+    #define NT_INFORMATION(Status) ((((ULONG)(Status)) >> 30) == 1)
+    #define NT_WARNING(Status)     ((((ULONG)(Status)) >> 30) == 2)
+    #define NT_ERROR(Status)       ((((ULONG)(Status)) >> 30) == 3)
+#endif
 
 typedef struct _UNICODE_STRING {
     USHORT       Length;
@@ -192,17 +204,17 @@ typedef struct _UNICODE_STRING64 {
 #define CONST_UNICODE_STRING CONST_STRING
 #define CONST_ANSII_STRING   CONST_STRING
 
-#define OBJ_INHERIT                         0x00000002L
-#define OBJ_PERMANENT                       0x00000010L
-#define OBJ_EXCLUSIVE                       0x00000020L
-#define OBJ_CASE_INSENSITIVE                0x00000040L
-#define OBJ_OPENIF                          0x00000080L
-#define OBJ_OPENLINK                        0x00000100L
-#define OBJ_KERNEL_HANDLE                   0x00000200L
-#define OBJ_FORCE_ACCESS_CHECK              0x00000400L
-#define OBJ_IGNORE_IMPERSONATED_DEVICEMAP   0x00000800L
-#define OBJ_DONT_REPARSE                    0x00001000L
-#define OBJ_VALID_ATTRIBUTES                0x00001FF2L
+#define OBJ_INHERIT                         0x00000002
+#define OBJ_PERMANENT                       0x00000010
+#define OBJ_EXCLUSIVE                       0x00000020
+#define OBJ_CASE_INSENSITIVE                0x00000040
+#define OBJ_OPENIF                          0x00000080
+#define OBJ_OPENLINK                        0x00000100
+#define OBJ_KERNEL_HANDLE                   0x00000200
+#define OBJ_FORCE_ACCESS_CHECK              0x00000400
+#define OBJ_IGNORE_IMPERSONATED_DEVICEMAP   0x00000800
+#define OBJ_DONT_REPARSE                    0x00001000
+#define OBJ_VALID_ATTRIBUTES                0x00001FF2
 
 typedef struct _OBJECT_ATTRIBUTES {
     ULONG Length;
@@ -222,14 +234,26 @@ typedef struct _IO_STATUS_BLOCK {
     ULONG_PTR Information;
 } IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
 
-#define InitializeObjectAttributes( p, n, a, r, s ) { \
-    (p)->Length = sizeof( OBJECT_ATTRIBUTES );          \
-    (p)->RootDirectory = r;                             \
-    (p)->Attributes = a;                                \
-    (p)->ObjectName = n;                                \
-    (p)->SecurityDescriptor = s;                        \
-    (p)->SecurityQualityOfService = NULL;               \
+#define InitializeObjectAttributes(P, N, A, R, S) { \
+    (p)->Length = sizeof(OBJECT_ATTRIBUTES);        \
+    (p)->RootDirectory = r;                         \
+    (p)->Attributes = a;                            \
+    (p)->ObjectName = n;                            \
+    (p)->SecurityDescriptor = s;                    \
+    (p)->SecurityQualityOfService = NULL;           \
     }
+
+#define RTL_CONSTANT_OBJECT_ATTRIBUTES(N, A) \
+    {                                        \
+        sizeof(OBJECT_ATTRIBUTES),           \
+        NULL,                                \
+        N,                                   \
+        A,                                   \
+        NULL,                                \
+        NULL                                 \
+    }
+
+#define RTL_INIT_OBJECT_ATTRIBUTES(N, A) RTL_CONSTANT_OBJECT_ATTRIBUTES(N, A)
 
 typedef enum _NT_PRODUCT_TYPE {
     NtProductWinNt    = 1,
@@ -275,8 +299,8 @@ typedef struct _KUSER_SHARED_DATA {
     UCHAR   Reserved8[0x14];
 
     union {
-        KSYSTEM_TIME TickCount;
-        ULONG64 TickCountQuad;
+        VOLATILE KSYSTEM_TIME TickCount;
+        VOLATILE ULONG64 TickCountQuad;
     };
 } KUSER_SHARED_DATA, *PKUSER_SHARED_DATA;
 
@@ -582,30 +606,89 @@ typedef struct _LDR_DATA_TABLE_ENTRY64 {
     LDR_DLL_LOAD_REASON LoadReason;
 } LDR_DATA_TABLE_ENTRY64, *PLDR_DATA_TABLE_ENTRY64;
 
+typedef struct _CURDIR32 {
+    UNICODE_STRING32 DosPath;
+    PVOID32 Handle;
+} CURDIR32, *PCURDIR32;
+
+typedef struct _CURDIR64 {
+    UNICODE_STRING64 DosPath;
+    PVOID64 Handle;
+} CURDIR64, *PCURDIR64;
+
+typedef struct _RTL_USER_PROCESS_PARAMETERS32 {
+    ULONG32  MaximumLength;
+    ULONG32  Length;
+    ULONG32  Flags;
+    ULONG32  DebugFlags;
+    PVOID32  ConsoleHandle;
+    ULONG32  ConsoleFlags;
+    PVOID32  StandardInput;
+    PVOID32  StandardOutput;
+    PVOID32  StandardError;
+    CURDIR32 CurrentDirectory;
+    UNICODE_STRING32 DllPath;
+    UNICODE_STRING32 ImagePathName;
+    UNICODE_STRING32 CommandLine;
+    PVOID32  Environment;
+    PVOID32  Reserve1[0x91];
+    ULONG32  EnvironmentSize;
+    ULONG32  EnvironmentVersion;
+} RTL_USER_PROCESS_PARAMETERS32, *PRTL_USER_PROCESS_PARAMETERS32;
+
+typedef struct _RTL_USER_PROCESS_PARAMETERS64 {
+    ULONG32  MaximumLength;
+    ULONG32  Length;
+    ULONG32  Flags;
+    ULONG32  DebugFlags;
+    PVOID64  ConsoleHandle;
+    ULONG32  ConsoleFlags;
+    PVOID64  StandardInput;
+    PVOID64  StandardOutput;
+    PVOID64  StandardError;
+    CURDIR64 CurrentDirectory;
+    UNICODE_STRING64 DllPath;
+    UNICODE_STRING64 ImagePathName;
+    UNICODE_STRING64 CommandLine;
+    PVOID64  Environment;
+    PVOID32  Reserve1[0xDA];
+    ULONG64  EnvironmentSize;
+    ULONG64  EnvironmentVersion;
+} RTL_USER_PROCESS_PARAMETERS64, *PRTL_USER_PROCESS_PARAMETERS64;
+
 #ifdef _M_AMD64
-    typedef CLIENT_ID64             CLIENT_ID;
-    typedef TEB64                   TEB;
-    typedef PEB64                   PEB;
-    typedef PEB_LDR_DATA64          PEB_LDR_DATA;
-    typedef LDR_DATA_TABLE_ENTRY64  LDR_DATA_TABLE_ENTRY;
-
-    typedef PCLIENT_ID64            PCLIENT_ID;
-    typedef PTEB64                  PTEB;
-    typedef PPEB64                  PPEB;
-    typedef PPEB_LDR_DATA64         PPEB_LDR_DATA;
-    typedef PLDR_DATA_TABLE_ENTRY64 PLDR_DATA_TABLE_ENTRY;
+    typedef CURDIR64                      CURDIR;
+    typedef CLIENT_ID64                   CLIENT_ID;
+    typedef TEB64                         TEB;
+    typedef PEB64                         PEB;
+    typedef PEB_LDR_DATA64                PEB_LDR_DATA;
+    typedef LDR_DATA_TABLE_ENTRY64        LDR_DATA_TABLE_ENTRY;
+    typedef RTL_USER_PROCESS_PARAMETERS64 RTL_USER_PROCESS_PARAMETERS;
+    
+    typedef PCURDIR64                      PCURDIR;
+    typedef PCLIENT_ID64                   PCLIENT_ID;
+    typedef PTEB64                         PTEB;
+    typedef PPEB64                         PPEB;
+    typedef PPEB_LDR_DATA64                PPEB_LDR_DATA;
+    typedef PLDR_DATA_TABLE_ENTRY64        PLDR_DATA_TABLE_ENTRY;
+    typedef PRTL_USER_PROCESS_PARAMETERS64 PRTL_USER_PROCESS_PARAMETERS;
 #else
-    typedef CLIENT_ID32             CLIENT_ID;
-    typedef TEB32                   TEB;
-    typedef PEB32                   PEB;
-    typedef PEB_LDR_DATA32          PEB_LDR_DATA;
-    typedef LDR_DATA_TABLE_ENTRY32  LDR_DATA_TABLE_ENTRY;
+    typedef CURDIR64                      CURDIR;
+    typedef CLIENT_ID32                   CLIENT_ID;
+    typedef TEB32                         TEB;
+    typedef PEB32                         PEB;
+    typedef PEB_LDR_DATA32                PEB_LDR_DATA;
+    typedef LDR_DATA_TABLE_ENTRY32        LDR_DATA_TABLE_ENTRY;
+    typedef RTL_USER_PROCESS_PARAMETERS32 RTL_USER_PROCESS_PARAMETERS;
 
-    typedef PCLIENT_ID32            PCLIENT_ID;
-    typedef PTEB32                  PTEB;
-    typedef PPEB32                  PPEB;
-    typedef PPEB_LDR_DATA32         PPEB_LDR_DATA;
-    typedef PLDR_DATA_TABLE_ENTRY32 PLDR_DATA_TABLE_ENTRY;
+    typedef PCURDIR32                      PCURDIR;
+    typedef PCLIENT_ID32                   PCLIENT_ID;
+    typedef PTEB32                         PTEB;
+    typedef PPEB32                         PPEB;
+    typedef PPEB_LDR_DATA32                PPEB_LDR_DATA;
+    typedef PLDR_DATA_TABLE_ENTRY32        PLDR_DATA_TABLE_ENTRY;
+    typedef PRTL_USER_PROCESS_PARAMETERS32 PRTL_USER_PROCESS_PARAMETERS;
+
 #endif
 
 PRAGMA_WARNING_DISABLE_POP(344)

