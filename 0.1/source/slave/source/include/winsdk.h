@@ -178,9 +178,9 @@ typedef LONG NTSTATUS, *PNTSTATUS;
 #endif
 
 typedef struct _UNICODE_STRING {
-    USHORT       Length;
-    USHORT       MaximumLength;
-    WCHAR *PTR32 Buffer;
+    USHORT Length;
+    USHORT MaximumLength;
+    PWSTR  Buffer;
 } UNICODE_STRING, *PTR32 PUNICODE_STRING, *PTR64 LPUNICODE_STRING;
 
 typedef struct _UNICODE_STRING32 {
