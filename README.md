@@ -22,4 +22,6 @@ __GNU_MAKE is the folder where mine Make is
 ### Cool people
 http://sandpile.org
 
+### Current view
+
 ![image1](images/image01.png)
