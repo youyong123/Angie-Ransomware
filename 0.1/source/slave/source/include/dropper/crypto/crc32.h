@@ -27,12 +27,12 @@ VOID
 FORCEINLINE
 InitCrc32(VOID)
 {
-    $DLOG0(DLG_FLT_INFO, "Initializing CRC32");
-    $DLOG2(DLG_FLT_DEFAULT, Config.Features.bSSE5 ? "Using CRC32 instructions" : "Using the slow method");
+    $DLOG1(DLG_FLT_INFO, "Initializing CRC32");
+    $DLOG3(DLG_FLT_DEFAULT, Config.Features.bSSE5 ? "Using CRC32 instructions" : "Using the slow method");
 
     Crc32SumBuffer = Config.Features.bSSE5 ? FastCrc32SumBuffer : SlowCrc32SumBuffer;
 
-    $DLOG1(DLG_FLT_INFO, "Done");
+    $DLOG2(DLG_FLT_INFO, "Done");
 }
 
 #endif

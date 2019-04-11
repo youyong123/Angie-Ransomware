@@ -29,17 +29,17 @@ NtFreeVirtualMemory(
 NTSTATUS
 NTAPISTUB
 NtCreateThreadEx(
-    OUT PHTRHEAD    hThread,
-    IN  ACCESS_MASK DesiredAccess,
-    IN  PVOID       ObjectAttributes,
-    IN  HPROCESS    ProcessHandle,
-    IN  PTHREAD_START_ROUTINE pStartAddress,
-    IN  PVOID       pParameter,
-    IN  BOOL        CreateSuspended,
-    IN  ULONG       StackZeroBits,
-    IN  ULONG       SizeOfStackCommit,
-    IN  ULONG       SizeOfStackReserve,
-    OUT PVOID       pBytesBuffer
+    OUT     PHTRHEAD    hThread,
+    IN      ACCESS_MASK DesiredAccess,
+    IN  OPT POBJECT_ATTRIBUTES ObjectAttributes,
+    IN      HPROCESS    ProcessHandle,
+    IN      PVOID       StartAddress,
+    IN  OPT PVOID       Arguments,
+    IN      ULONG       CreateFlags,
+    IN      ULONG       StackZeroBits,
+    IN      ULONG       SizeOfStackCommit,
+    IN      ULONG       SizeOfStackReserve,
+    IN  OPT PPS_ATTRIBUTE_LIST AttributeList
     );
 
 NTSTATUS
@@ -86,6 +86,13 @@ NTAPISTUB
 NtTerminateProcess(
     IN OPT HANDLE   ProcessHandle,
     IN     NTSTATUS ExitStatus
+    );
+
+NTSTATUS
+NTAPI
+NtDelayExecution(
+    IN BOOLEAN        Alertable,
+    IN PLARGE_INTEGER DelayInterval
     );
 
 #endif

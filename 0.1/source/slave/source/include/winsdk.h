@@ -37,6 +37,7 @@
 #define DECLSPEC_SELECTANY             __declspec(selectany)
 #define DECLSPEC_DLLIMPORT             __declspec(dllimport)
 #define DECLSPEC_DLLEXPORT             __declspec(dllexport)
+#define DECLSPEC_SELECTANY             __declspec(selectany)
 
 #define CDECL      __cdecl
 #define STDCALL    __stdcall
@@ -688,8 +689,62 @@ typedef struct _RTL_USER_PROCESS_PARAMETERS64 {
     typedef PPEB_LDR_DATA32                PPEB_LDR_DATA;
     typedef PLDR_DATA_TABLE_ENTRY32        PLDR_DATA_TABLE_ENTRY;
     typedef PRTL_USER_PROCESS_PARAMETERS32 PRTL_USER_PROCESS_PARAMETERS;
-
 #endif
+
+#define THREAD_CREATE_FLAGS_CREATE_SUSPENDED        0x00000001
+#define THREAD_CREATE_FLAGS_SKIP_THREAD_ATTACH      0x00000002 // ?
+#define THREAD_CREATE_FLAGS_HIDE_FROM_DEBUGGER      0x00000004
+#define THREAD_CREATE_FLAGS_HAS_SECURITY_DESCRIPTOR 0x00000010 // ?
+#define THREAD_CREATE_FLAGS_ACCESS_CHECK_IN_TARGET  0x00000020 // ?
+#define THREAD_CREATE_FLAGS_INITIAL_THREAD          0x00000080
+
+#define PS_ATTRIBUTE_NUMBER_MASK 0x0000FFFF
+#define PS_ATTRIBUTE_THREAD      0x00010000 // may be used with thread creation
+#define PS_ATTRIBUTE_INPUT       0x00020000 // input only
+#define PS_ATTRIBUTE_ADDITIVE    0x00040000 // "accumulated" e.g. bitmasks, counters, etc.
+
+typedef enum _PS_ATTRIBUTE_NUMBER {
+    PsAttributeParentProcess,                // in HANDLE
+    PsAttributeDebugPort,                    // in HANDLE
+    PsAttributeToken,                        // in HANDLE
+    PsAttributeClientId,                     // out PCLIENT_ID
+    PsAttributeTebAddress,                   // out PTEB *
+    PsAttributeImageName,                    // in PWSTR
+    PsAttributeImageInfo,                    // out PSECTION_IMAGE_INFORMATION
+    PsAttributeMemoryReserve,                // in PPS_MEMORY_RESERVE
+    PsAttributePriorityClass,                // in UCHAR
+    PsAttributeErrorMode,                    // in ULONG
+    PsAttributeStdHandleInfo,                // 10, in PPS_STD_HANDLE_INFO
+    PsAttributeHandleList,                   // in PHANDLE
+    PsAttributeGroupAffinity,                // in PGROUP_AFFINITY
+    PsAttributePreferredNode,                // in PUSHORT
+    PsAttributeIdealProcessor,               // in PPROCESSOR_NUMBER
+    PsAttributeUmsThread,                    // ? in PUMS_CREATE_THREAD_ATTRIBUTES
+    PsAttributeMitigationOptions,            // in UCHAR
+    PsAttributeProtectionLevel,              // in ULONG
+    PsAttributeSecureProcess,                // since THRESHOLD
+    PsAttributeJobList,
+    PsAttributeChildProcessPolicy,           // since THRESHOLD2
+    PsAttributeAllApplicationPackagesPolicy, // since REDSTONE
+    PsAttributeWin32kFilter,
+    PsAttributeSafeOpenPromptOriginClaim,
+    PsAttributeBnoIsolation,                 // PS_BNO_ISOLATION_PARAMETERS
+    PsAttributeDesktopAppPolicy,             // in ULONG
+    PsAttributeChpe,                         // since REDSTONE3
+    PsAttributeMax
+} PS_ATTRIBUTE_NUMBER;
+
+typedef struct _PS_ATTRIBUTE {
+    ULONG_PTR Attribute;
+    SIZE_T    Size;
+    PVOID     Value;
+    PSIZE_T   ReturnLength;
+} PS_ATTRIBUTE, *PPS_ATTRIBUTE;
+
+typedef struct _PS_ATTRIBUTE_LIST {
+    SIZE_T TotalLength;
+    PS_ATTRIBUTE Attributes[ANYSIZE_ARRAY];
+} PS_ATTRIBUTE_LIST, *PPS_ATTRIBUTE_LIST;
 
 PRAGMA_WARNING_DISABLE_POP(344)
 

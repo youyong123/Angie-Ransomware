@@ -11,8 +11,10 @@
 typedef enum _$DLOGTYPE {
     DLG_ATT_COLOURS  = 0x00010000,
     DLG_ATT_TICKS    = 0x00020000,
-    DLG_ATT_ADDRESS  = 0x00040000,
-    DLG_ATT_PROCNAME = 0x00080000,
+    DLG_ATT_PID      = 0x00040000,
+    DLG_ATT_TID      = 0x00080000,
+    DLG_ATT_ADDRESS  = 0x00100000,
+    DLG_ATT_PROCNAME = 0x00200000,
 
     #if DEBUG_LEVEL > DEBUG_LEVEL_INFORMATIVE  // DEBUG_LEVEL_EVERYTHING
         #define DEBUG_STATIC_MASK (DLG_ATT_PROCNAME_ALIGN(SCFG_DLOG_LARGEST_PROC_NAME) | 0x000F0000) // DLG_ATT_COLOURS | DLG_ATT_TICKS | DLG_ATT_ADDRESS | DLG_ATT_PROCNAME
@@ -42,7 +44,7 @@ typedef enum _$DLOGTYPE {
 
     VOID
     DLOGAPIX
-    $DLogSendEx(
+    $DLogSendExLocal(
         IN $DLOGTYPE Type,
         IN PSTR      szFunctioName,
         IN PCSTR     szFormat,
@@ -51,20 +53,38 @@ typedef enum _$DLOGTYPE {
 
     VOID
     DLOGAPIX
-    $DLogSend(
+    $DLogSendExGlobal(
+        IN $DLOGTYPE Type,
+        IN PSTR      szFunctioName,
+        IN PCSTR     szFormat,
+        IN ...
+        );
+
+    VOID
+    DLOGAPIX
+    $DLogSendLocal(
+        IN PCSTR szFormat,
+        IN ...
+        );
+
+    VOID
+    DLOGAPIX
+    $DLogSendGlobal(
         IN PCSTR szFormat,
         IN ...
         );
 
     VOID
     DLOGAPI
-    $DLogDestroy(VOID);
+    $DLogDestroy(
+        IN BOOL bDestroyLocal
+        );
 
     VOID
     DLOGAPI
     $DLogInitialize(
         IN PUNICODE_STRING MasterPipeName,
-        IN ULONG_PTR dwWriteBufferSize
+        IN BOOL bCreateLocal
         );
 
     #undef DLOGAPI
@@ -72,27 +92,27 @@ typedef enum _$DLOGTYPE {
 #endif
 
 #if DEBUG_LEVEL > DEBUG_LEVEL_NO_LOG      // DEBUG_LEVEL_CASUAL
-    #define $DLOGRAW0(FORMAT, ...)    $DLogSend(FORMAT, __VA_ARGS__)
-    #define $DLOG0(TYPE, FORMAT, ...) $DLogSendEx(TYPE, __FUNCTION__, FORMAT, __VA_ARGS__)
-#else
-    #define $DLOGRAW0 __noop
-    #define $DLOG0    __noop
-#endif
-
-#if DEBUG_LEVEL > DEBUG_LEVEL_CASUAL      // DEBUG_LEVEL_INFORMATIVE
-    #define $DLOGRAW1(FORMAT, ...)    $DLogSend(FORMAT, __VA_ARGS__)
-    #define $DLOG1(TYPE, FORMAT, ...) $DLogSendEx(TYPE, __FUNCTION__, FORMAT, __VA_ARGS__)
+    #define $DLOGRAW1(FORMAT, ...)    $DLogSendLocal(FORMAT, __VA_ARGS__)
+    #define $DLOG1(TYPE, FORMAT, ...) $DLogSendExLocal(TYPE, __FUNCTION__, FORMAT, __VA_ARGS__)
 #else
     #define $DLOGRAW1 __noop
     #define $DLOG1    __noop
 #endif
 
-#if DEBUG_LEVEL > DEBUG_LEVEL_INFORMATIVE // DEBUG_LEVEL_EVERYTHING
-    #define $DLOGRAW2(FORMAT, ...)    $DLogSend(FORMAT, __VA_ARGS__)
-    #define $DLOG2(TYPE, FORMAT, ...) $DLogSendEx(TYPE, __FUNCTION__, FORMAT, __VA_ARGS__)
+#if DEBUG_LEVEL > DEBUG_LEVEL_CASUAL      // DEBUG_LEVEL_INFORMATIVE
+    #define $DLOGRAW2(FORMAT, ...)    $DLogSendLocal(FORMAT, __VA_ARGS__)
+    #define $DLOG2(TYPE, FORMAT, ...) $DLogSendExLocal(TYPE, __FUNCTION__, FORMAT, __VA_ARGS__)
 #else
     #define $DLOGRAW2 __noop
     #define $DLOG2    __noop
+#endif
+
+#if DEBUG_LEVEL > DEBUG_LEVEL_INFORMATIVE // DEBUG_LEVEL_EVERYTHING
+    #define $DLOGRAW3(FORMAT, ...)    $DLogSendLocal(FORMAT, __VA_ARGS__)
+    #define $DLOG3(TYPE, FORMAT, ...) $DLogSendExLocal(TYPE, __FUNCTION__, FORMAT, __VA_ARGS__)
+#else
+    #define $DLOGRAW3 __noop
+    #define $DLOG3    __noop
 #endif
 
 #ifdef DEBUG_C_ASSERT

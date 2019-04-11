@@ -26,11 +26,11 @@ RtlpGetTeb64(VOID)
         return (PTEB64)((ULONG_PTR)__readgsdword(FIELD_OFFSET(NT_TIB64, Self)));
     #else
         enum {
-            TEB_OFFSET = FIELD_OFFSET(NT_TIB64, Self)
+            TebOffset = FIELD_OFFSET(NT_TIB64, Self)
         };
 
         __asm {
-            mov eax, gs:[TEB_OFFSET]
+            mov eax, gs:[TebOffset]
         };
     #endif
 }

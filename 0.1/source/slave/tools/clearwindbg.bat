@@ -1,1 +1,1 @@
-@del /q /s %PROJECT_PATH%\log\windbg\*
+@del /q /s %PROJECT_PATH%\log\windbg\*.txt

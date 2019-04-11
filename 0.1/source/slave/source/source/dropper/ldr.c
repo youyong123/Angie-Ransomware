@@ -7,7 +7,6 @@ LdrGetModule(
     )
 {
     PPEB Peb = RtlpGetPeb();
-
     PLDR_DATA_TABLE_ENTRY Index = (PVOID)((PPEB_LDR_DATA)Peb->Ldr)->InLoadOrderModuleList.Flink;
     PLDR_DATA_TABLE_ENTRY End   = Index;
 
@@ -26,10 +25,10 @@ LdrGetModule(
 
 ULONG
 LdrGetProcAddressEx(
-    IN HMODULE hModule,
-    IN ULONG   dwProcCount,
-    IN PDWORD  dwNameSumsList,
-    IN PVOID   pProcList
+    IN  HMODULE hModule,
+    IN  ULONG   dwProcCount,
+    IN  PDWORD  dwNameSumsList,
+    OUT PVOID   ProcessList
     )
 {
     PIMAGE_OPTIONAL_HEADER  OptionalHeader  = (PIMAGE_OPTIONAL_HEADER )((ULONG_PTR)hModule + ((PIMAGE_DOS_HEADER)hModule)->e_lfanew + sizeof(ULONG) + IMAGE_SIZEOF_FILE_HEADER);
@@ -55,10 +54,10 @@ LdrGetProcAddressEx(
         for (ULONG y = 0; y != dwProcCount; y++) {
             if (dwFunctionSum == dwNameSumsList[y]) {
                 #if SCFG_DROPPER_LDR_PRINT_FOUND_PROC == ON
-                    $DLOG0(DLG_FLT_SUCCESS, "%p %08lX %s", dwFunctionAddress, dwFunctionSum, (PSTR)((ULONG_PTR)hModule + dwNames[i]));
+                    $DLOG1(DLG_FLT_SUCCESS, "%p %08lX %s", dwFunctionAddress, dwFunctionSum, (PSTR)((ULONG_PTR)hModule + dwNames[i]));
                 #endif
 
-                ((PULONG_PTR)pProcList)[y] = dwFunctionAddress;
+                ((PULONG_PTR)ProcessList)[y] = dwFunctionAddress;
                 dwProcFound++;
         
                 break;

@@ -7,7 +7,8 @@ PVOID NtapiSyscallsAddressStorage[] = {
     (PVOID)RTLP_LCG_NATIVE, // NtClose
     (PVOID)RTLP_LCG_NATIVE, // NtCreateMutant
     (PVOID)RTLP_LCG_NATIVE, // NtOpenMutant
-    (PVOID)RTLP_LCG_NATIVE  // NtTerminateProcess
+    (PVOID)RTLP_LCG_NATIVE, // NtTerminateProcess
+    (PVOID)RTLP_LCG_NATIVE  // NtDelayExecution
 };
 
 #define NTDLL_SYSCALL_WOW64(n, xpwow, vwow, w7wow, w8wow, w81wow, w10wow, w11wow, w12wow, w13wow, w14wow, w15wow, w16wow)
@@ -26,7 +27,8 @@ DWORD NtapiSyscallsNamesHash[] = {
     0x6B372C05 ^ XOR_KEY, // NtClose
     0xB06BF858 ^ XOR_KEY, // NtCreateMutant
     0x13677D9C ^ XOR_KEY, // NtOpenMutant
-    0x1F2F8E87 ^ XOR_KEY  // NtTerminateProcess
+    0x1F2F8E87 ^ XOR_KEY, // NtTerminateProcess
+    0xD856E554 ^ XOR_KEY  // NtDelayExecution
 };
 
 CONST ULONG NtapiSyscallsOffsetX86[] = {

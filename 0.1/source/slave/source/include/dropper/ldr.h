@@ -8,10 +8,10 @@ LdrGetModule(
 
 ULONG
 LdrGetProcAddressEx(
-    IN HMODULE hModule,
-    IN ULONG   dwProcCount,
-    IN PDWORD  dwNameSumsList,
-    IN PVOID   pProcList
+    IN  HMODULE hModule,
+    IN  ULONG   dwProcCount,
+    IN  PDWORD  dwNameSumsList,
+    OUT PVOID   ProcessList
     );
 
 #if 0

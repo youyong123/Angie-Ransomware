@@ -53,4 +53,11 @@ BOOL
 DECLSPEC_NOINLINE
 InitConfig(VOID);
 
+//static
+//VOID
+//ValidateConfig(VOID)
+//{
+//    // TODO: 
+//}
+
 #endif

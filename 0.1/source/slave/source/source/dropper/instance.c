@@ -38,7 +38,7 @@ BOOL
 DECLSPEC_NOINLINE
 CreateInstance(VOID)
 {
-    $DLOG0(DLG_FLT_INFO, "Creating a instance");
+    $DLOG1(DLG_FLT_INFO, "Creating a instance");
 
     DWORD dwBuffer[4];
     WCHAR sAsciiHex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -50,7 +50,7 @@ CreateInstance(VOID)
         ULONG dwSeed = Crc32SumBuffer(ImagePathName->Buffer, ImagePathName->Length);
     #endif
 
-    $DLOG2(DLG_FLT_DEFAULT, "Seed  : 0x%08lX", dwSeed);
+    $DLOG3(DLG_FLT_DEFAULT, "Seed  : 0x%08lX", dwSeed);
 
     for (ULONG_PTR i = 0; i != 4; i++) {
         PRAGMA_NOINLINE
@@ -92,7 +92,7 @@ CreateInstance(VOID)
         }
     };
 
-    $DLOG2(DLG_FLT_DEFAULT, "Mutant: %ls", InstanceMutantPath);
+    $DLOG3(DLG_FLT_DEFAULT, "Mutant: %ls", InstanceMutantPath);
 
     UNICODE_STRING String = {
         sizeof(InstanceMutantPath),
@@ -106,7 +106,7 @@ CreateInstance(VOID)
     );
 
     if (NT_SUCCESS(NtOpenMutant(&InstanceMutantObject, STANDARD_RIGHTS_ALL | FILE_READ_DATA, &Object))) {
-        $DLOG0(DLG_FLT_ERROR, "Another instance is running");
+        $DLOG1(DLG_FLT_ERROR, "Another instance is running");
 
         return FALSE;
     }
@@ -114,12 +114,12 @@ CreateInstance(VOID)
     Object.Attributes = 0;
 
     if (NT_ERROR(NtCreateMutant(&InstanceMutantObject, STANDARD_RIGHTS_ALL | FILE_READ_DATA, &Object, TRUE))) {
-        $DLOG0(DLG_FLT_CRITICAL, "Failed to create new mutex");
+        $DLOG1(DLG_FLT_CRITICAL, "Failed to create new mutex");
 
         return FALSE;
     }
 
-    $DLOG1(DLG_FLT_INFO, "Done");
+    $DLOG2(DLG_FLT_INFO, "Done");
 
     return TRUE;
 }

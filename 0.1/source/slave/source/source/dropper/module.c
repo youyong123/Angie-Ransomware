@@ -3,7 +3,7 @@
 BOOL
 InitModule(VOID)
 {
-    $DLOG2(DLG_FLT_HIGHLIGHT, "TODO Don't forget me idiot!");
+    $DLOG3(DLG_FLT_HIGHLIGHT, "TODO Don't forget me idiot!");
 
     return FALSE;
 }

