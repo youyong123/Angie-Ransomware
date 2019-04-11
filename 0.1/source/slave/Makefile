@@ -36,7 +36,7 @@ link:
 	$(PROJECT_OBJECT_PATH)/decoy/*.obj
 
 r:
-	cmd /c "$(PROJECT_BIN_PATH)/$(PROJECT_BUILD)/Slave.exe"
+	start cmd /c "$(PROJECT_BIN_PATH)/$(PROJECT_BUILD)/Slave.exe"
 
 # x86 modules
 c: dropper
