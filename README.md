@@ -1,6 +1,6 @@
 # Angie-Ransomware
 
-Will add better and more detailed documentation in the future and more easy to compile scripts
+Will add better and more detailed documentation in the future and more easy scripts to compile
 
 ### Requirements
 Intel or AMD processor that support "CMOVcc, MMX, SSE, SSE2, TSC"   
