@@ -1,5 +1,6 @@
 # Angie-Ransomware
 
+Professional ransomware for educational purposes   
 Will add better and more detailed documentation in the future and more easy scripts to compile
 
 ### Requirements
