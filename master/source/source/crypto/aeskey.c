@@ -1,6 +1,6 @@
-#include <aeskey.h>
-#include <aes.h>
-#include <crc32.h>
+#include <crypto\aeskey.h>
+#include <crypto\aes.h>
+#include <crypto\crc32.h>
 #include <core\cpu.h>
 #include <core\config.h>
 #include <core\console.h>

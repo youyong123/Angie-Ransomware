@@ -1,4 +1,4 @@
-#include <ntapi.h>
+#include <core\ntapi.h>
 
 ULONG
 (CDECL * fnVsnprintf)(

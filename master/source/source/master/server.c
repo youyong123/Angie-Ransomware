@@ -1,5 +1,5 @@
 #include <wsasdk.h>
-#include <server.h>
+#include <master\server.h>
 #include <core\config.h>
 #include <core\console.h>
 #include <core\memory.h>

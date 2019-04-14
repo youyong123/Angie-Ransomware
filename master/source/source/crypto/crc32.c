@@ -1,4 +1,4 @@
-#include <crc32.h>
+#include <crypto\crc32.h>
 
 DWORD
 (* Crc32SumBuffer)(

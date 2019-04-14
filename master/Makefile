@@ -25,16 +25,16 @@ endef
 all: rtlp core crypto master link r
 
 rtlp:
-	$(call CompileModule,source/source/,rtlp,,)
+	$(CC) $(CLFL_BASE) $(CLFL_CPU) $(CLFL_OX) $(CLFL_ADDON) /c source/source/rtlp/*.c /Fo:$(PROJECT_OBJECT_PATH)/rtlp/
 
 core:
-	$(call CompileModule,source/source/,core,,)
+	$(CC) $(CLFL_BASE) $(CLFL_CPU) $(CLFL_OX) $(CLFL_ADDON) /c source/source/core/*.c /Fo:$(PROJECT_OBJECT_PATH)/core/
 
 crypto:
-	$(call CompileModule,source/source/,crypto,,)
+	$(CC) $(CLFL_BASE) $(CLFL_CPU) $(CLFL_OX) $(CLFL_ADDON) /c source/source/crypto/*.c /Fo:$(PROJECT_OBJECT_PATH)/crypto/
 
 master:
-	$(call CompileModule,source/source/,master,,)
+	$(CC) $(CLFL_BASE) $(CLFL_CPU) $(CLFL_OX) $(CLFL_ADDON) /c source/source/master/*.c /Fo:$(PROJECT_OBJECT_PATH)/master/
 
 link:
 	$(LD) /NOLOGO /TIME $(LDFL) /MAP:$(PROJECT_BIN_PATH)/$(PROJECT_BUILD)/Master.map /PDB:$(PROJECT_BIN_PATH)/$(PROJECT_BUILD)/Master.pdb /OUT:$(PROJECT_BIN_PATH)/$(PROJECT_BUILD)/Master.exe \

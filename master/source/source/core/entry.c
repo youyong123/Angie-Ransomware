@@ -1,9 +1,9 @@
 #include <wsasdk.h>
-#include <cpu.h>
-#include <ntapi.h>
-#include <console.h>
-#include <memory.h>
-#include <config.h>
+#include <core\cpu.h>
+#include <core\ntapi.h>
+#include <core\console.h>
+#include <core\memory.h>
+#include <core\config.h>
 #include <crypto\init.h>
 #include <master\server.h>
 
