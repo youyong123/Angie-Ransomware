@@ -18,7 +18,7 @@
 #define IS_INVALID_SOCKET(X)  ((X) == INVALID_SOCKET)
 #define NOT_INVALID_SOCKET(X) ((X) != INVALID_SOCKET)
 
-/* It makes me angry we need to call a function for use a port, kkk */
+/* It makes me angry we need to call a function to use a port, kkk */
 #define HTONS(X) (X << 8 | X >> 8)
 
 #endif
