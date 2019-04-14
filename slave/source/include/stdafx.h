@@ -74,6 +74,7 @@ typedef enum _NTVERSION {
 #define SCFG_DLOG_DROPPER_THREAD0 L"\\Device\\NamedPipe\\{49E0CB71-B6D5-4501-A508-E7770725CF55}"
 #define SCFG_DLOG_DROPPER_THREAD1 L"\\Device\\NamedPipe\\{49E0CB71-B6D5-4501-A508-E7770725CF55}"
 
+// TODO: rename to core
 #pragma region DROPPER
     #define SCFG_DROPPER_LDR_PRINT_FOUND_PROC    OFF // OFF
 
