@@ -1,0 +1,16 @@
+#ifndef __INCLUDE_CORE_CPU_H
+#define __INCLUDE_CORE_CPU_H
+
+typedef struct _CPUFEATURES {
+    BOOL SSE5;
+    BOOL AES;
+    BOOL RdRand;
+} CPUFEATURES, *PCPUFEATURES;
+
+extern CPUFEATURES CpuFeatures;
+
+BOOL
+DECLSPEC_NOINLINE
+InitCpu(VOID);
+
+#endif
