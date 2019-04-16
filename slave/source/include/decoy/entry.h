@@ -1,8 +1,0 @@
-#ifndef __INCLUDE_DECOY_ENTRY_H
-#define __INCLUDE_DECOY_ENTRY_H
-
-ULONG
-WINAPI
-DecoyEntry(VOID);
-
-#endif

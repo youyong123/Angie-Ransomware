@@ -1,147 +1,57 @@
-        0  784:1760 0x011736AD ConfigIsProcessorCompatible    *³ Checking if processor is supported
-        0  784:1760 0x01173774 ConfigIsProcessorCompatible     ³ Vendor: "GenuineIntel" (EBX:756E6547 EDX:49656E69 ECX:6C65746E)
-        0  784:1760 0x011737E8 ConfigIsProcessorCompatible     ³ Config.Cpu.bIntel      = 1
-        0  784:1760 0x01173805 ConfigIsProcessorCompatible     ³ Config.Cpu.bAmd        = 0
-        0  784:1760 0x01173822 ConfigIsProcessorCompatible     ³ Config.Cpu.bUnderWow64 = 43
-        0  784:1760 0x01173839 ConfigIsProcessorCompatible    *³ Done
-        0  784:1760 0x01173850 ConfigIsHyperVisorSupported    *³ Checking if hypervisor is supported
-        0  784:1760 0x011739F8 ConfigIsHyperVisorSupported     ³ Not present
-        0  784:1760 0x01173A0F ConfigIsWindowsSupported       *³ Checking if windows is supported
-        0  784:1760 0x01173A57 ConfigIsNtVersionSupported      ³ NT Version: 10.0 Build:17763
-        0  784:1760 0x01173BB2 ConfigIsNtVersionSupported      ³ Config.NtVersion.dwCommonIndex = 9
-        0  784:1760 0x01173CA1 ConfigIsWindowsSupported       *³ Done
-        0  784:1760 0x01172988 LdrLoadNtapi                   *³ Loading NTAPI
-        0  784:1760 0x011729C6 LdrLoadNtapi                    ³ ntdll.dll = 0x778F0000
-        0  784:1760 0x01172A6E LdrLoadNtapi                   *³ Done
-        0  784:1760 0x011734DF InitCrc32                      *³ Initializing CRC32
-        0  784:1760 0x01173503 InitCrc32                       ³ Using CRC32 instructions
-        0  784:1760 0x01173539 InitCrc32                      *³ Done
-        0  784:1760 0x01172B4D CreateInstance                 *³ Creating a instance
-        0  784:1760 0x01172B91 CreateInstance                  ³ Seed  : 0xF3FC4016
-        0  784:1760 0x01172DAF CreateInstance                  ³ Mutant: \BaseNamedObjects\C9002904-F168-36A2-C593278AAAF2
-        0  784:1760 0x01172E47 CreateInstance                 *³ Done
-        0  784:1760 0x0117358C InitialEntry                    ³ Second stage of InitialEntrySplitted started!
-        0  784:3932 0x011735E4 InitAes                        *³ Initializing AES
-        0  784:1760 0x0117322C DecoyEntry                     *³ Loading ws2_32.dll
-        0  784:3932 0x01173608 InitAes                         ³ Using the slow method
-        1  784:1760 0x01173259 DecoyEntry                     *³ Done
-        1  784:3932 0x01173666 InitAes                        *³ Done
-        1  784:3932 0x01172F43 ModuleInject                   *³ Injecting module 0x011770A0 1/2 pages to FFFFFFFF
-        1  784:3932 0x01172FA8 ModuleInject                    ³ Address: 0x004D0000 Compressed: 3181 Decompressed: 4992
-        1  784:3932 0x01172FE5 ModuleInject                    ³        0 RVA       6C SizeOfBlock
-        1  784:3932 0x011730A5 ModuleInject                    ³          2AC 3 00000C10 -> 004D0C10
-        1  784:3932 0x011730A5 ModuleInject                    ³          2B1 3 00000C00 -> 004D0C00
-        2  784:3932 0x011730A5 ModuleInject                    ³          2CD 3 00000C2C -> 004D0C2C
-        2  784:3932 0x011730A5 ModuleInject                    ³          2F3 3 00000C78 -> 004D0C78
-        2  784:3932 0x011730A5 ModuleInject                    ³          2F8 3 00000C68 -> 004D0C68
-        2  784:3932 0x011730A5 ModuleInject                    ³          31F 3 00000CA4 -> 004D0CA4
-        2  784:3932 0x011730A5 ModuleInject                    ³          324 3 00000C68 -> 004D0C68
-        2  784:3932 0x011730A5 ModuleInject                    ³          339 3 00000A80 -> 004D0A80
-        2  784:3932 0x011730A5 ModuleInject                    ³          343 3 00000F40 -> 004D0F40
-        2  784:3932 0x011730A5 ModuleInject                    ³          350 3 00000F50 -> 004D0F50
-        2  784:3932 0x011730A5 ModuleInject                    ³          359 3 00000F64 -> 004D0F64
-        2  784:3932 0x011730A5 ModuleInject                    ³          35E 3 00000F40 -> 004D0F40
-        2  784:3932 0x011730A5 ModuleInject                    ³          368 3 00000F60 -> 004D0F60
-        2  784:3932 0x011730A5 ModuleInject                    ³          374 3 00000F40 -> 004D0F40
-        2  784:3932 0x011730A5 ModuleInject                    ³          37C 3 00000F50 -> 004D0F50
-        2  784:3932 0x011730A5 ModuleInject                    ³          38B 3 00000CD0 -> 004D0CD0
-        2  784:3932 0x011730A5 ModuleInject                    ³          390 3 00000C68 -> 004D0C68
-        2  784:3932 0x011730A5 ModuleInject                    ³          3B2 3 00000CB8 -> 004D0CB8
-        3  784:3932 0x011730A5 ModuleInject                    ³          3B7 3 00000C68 -> 004D0C68
-        3  784:3932 0x011730A5 ModuleInject                    ³          3E7 3 00000C88 -> 004D0C88
-        3  784:3932 0x011730A5 ModuleInject                    ³          3EC 3 00000C68 -> 004D0C68
-        3  784:3932 0x011730A5 ModuleInject                    ³          557 3 00000C5C -> 004D0C5C
-        3  784:3932 0x011730A5 ModuleInject                    ³          55C 3 00000C48 -> 004D0C48
-        3  784:3932 0x011730A5 ModuleInject                    ³          5C1 3 00000D3C -> 004D0D3C
-        3  784:3932 0x011730A5 ModuleInject                    ³          5FC 3 00000D4A -> 004D0D4A
-        3  784:3932 0x011730A5 ModuleInject                    ³          661 3 00000D4A -> 004D0D4A
-        3  784:3932 0x011730A5 ModuleInject                    ³          6DD 3 00000D4A -> 004D0D4A
-        3  784:3932 0x011730A5 ModuleInject                    ³          741 3 00000D4A -> 004D0D4A
-        3  784:3932 0x011730A5 ModuleInject                    ³          74B 3 00000D4A -> 004D0D4A
-        3  784:3932 0x011730A5 ModuleInject                    ³          7AA 3 00000D10 -> 004D0D10
-        3  784:3932 0x011730A5 ModuleInject                    ³          7DF 3 00000D20 -> 004D0D20
-        3  784:3932 0x011730A5 ModuleInject                    ³          7F0 3 00000FC8 -> 004D0FC8
-        4  784:3932 0x011730A5 ModuleInject                    ³          821 3 00000FB4 -> 004D0FB4
-        4  784:3932 0x011730A5 ModuleInject                    ³          847 3 00000FB0 -> 004D0FB0
-        4  784:3932 0x011730A5 ModuleInject                    ³          86D 3 00000FAC -> 004D0FAC
-        4  784:3932 0x011730A5 ModuleInject                    ³          88D 3 00000FA0 -> 004D0FA0
-        4  784:3932 0x011730A5 ModuleInject                    ³          8D6 3 00000FC0 -> 004D0FC0
-        4  784:3932 0x011730A5 ModuleInject                    ³          902 3 00000FB8 -> 004D0FB8
-        4  784:3932 0x011730A5 ModuleInject                    ³          91A 3 00000CE0 -> 004D0CE0
-        4  784:3932 0x011730A5 ModuleInject                    ³          934 3 00000CFC -> 004D0CFC
-        4  784:3932 0x011730A5 ModuleInject                    ³          A3F 3 00000FB0 -> 004D0FB0
-        4  784:3932 0x011730A5 ModuleInject                    ³          CE0 3 00000D74 -> 004D0D74
-        4  784:3932 0x011730A5 ModuleInject                    ³          CE4 3 00000D80 -> 004D0D80
-        4  784:3932 0x011730A5 ModuleInject                    ³          CE8 3 00000D8C -> 004D0D8C
-        4  784:3932 0x011730A5 ModuleInject                    ³          CEC 3 00000D9C -> 004D0D9C
-        4  784:3932 0x011730A5 ModuleInject                    ³          CF0 3 00000DB0 -> 004D0DB0
-        4  784:3932 0x011730A5 ModuleInject                    ³          CF4 3 00000DC8 -> 004D0DC8
-        4  784:3932 0x011730A5 ModuleInject                    ³          CF8 3 00000DD0 -> 004D0DD0
-        4  784:3932 0x011730A5 ModuleInject                    ³          D00 3 00000D60 -> 004D0D60
-        4  784:3932 0x011730A5 ModuleInject                    ³            0 0 00000000 -> 004D0000
-        4  784:3932 0x01172FE5 ModuleInject                    ³     1000 RVA       1C SizeOfBlock
-        5  784:3932 0x011730A5 ModuleInject                    ³           D0 3 000002E8 -> 004D02E8
-        5  784:3932 0x011730A5 ModuleInject                    ³           E0 3 00000335 -> 004D0335
-        5  784:3932 0x011730A5 ModuleInject                    ³           F0 3 00000335 -> 004D0335
-        5  784:3932 0x011730A5 ModuleInject                    ³          184 3 00000408 -> 004D0408
-        5  784:3932 0x011730A5 ModuleInject                    ³          194 3 0000041C -> 004D041C
-        5  784:3932 0x011730A5 ModuleInject                    ³          1A4 3 00000436 -> 004D0436
-        5  784:3932 0x011730A5 ModuleInject                    ³          235 3 00000468 -> 004D0468
-        5  784:3932 0x011730A5 ModuleInject                    ³          245 3 000004BA -> 004D04BA
-        5  784:3932 0x011730A5 ModuleInject                    ³          255 3 000004FB -> 004D04FB
-        5  784:3932 0x011730A5 ModuleInject                    ³          265 3 0000051F -> 004D051F
-        5  784:3932 0x011730E0 ModuleInject                   *³ Done
-        5  784:3932 0x01172F43 ModuleInject                   *³ Injecting module 0x01177D20 1/2 pages to FFFFFFFF
-        5  784:3932 0x01172FA8 ModuleInject                    ³ Address: 0x004E0000 Compressed: 4072 Decompressed: 6592
-        6  784:3932 0x01172FE5 ModuleInject                    ³        0 RVA       1C SizeOfBlock
-        6  784:3932 0x01173063 ModuleInject                    ³          C88 A 0000000000000E20 -> 00000000004E0E20
-        6  784:3932 0x01173063 ModuleInject                    ³          F80 A 0000000000001034 -> 00000000004E1034
-        6  784:3932 0x01173063 ModuleInject                    ³          F88 A 0000000000001040 -> 00000000004E1040
-        6  784:3932 0x01173063 ModuleInject                    ³          F90 A 000000000000104C -> 00000000004E104C
-        6  784:3932 0x01173063 ModuleInject                    ³          F98 A 000000000000105C -> 00000000004E105C
-        6  784:3932 0x01173063 ModuleInject                    ³          FA0 A 0000000000001070 -> 00000000004E1070
-        6  784:3932 0x01173063 ModuleInject                    ³          FA8 A 0000000000001088 -> 00000000004E1088
-        6  784:3932 0x01173063 ModuleInject                    ³          FB0 A 0000000000001090 -> 00000000004E1090
-        6  784:3932 0x01173063 ModuleInject                    ³          FC0 A 0000000000001020 -> 00000000004E1020
-        6  784:3932 0x01173063 ModuleInject                    ³            0 0 0000000000000000 -> 00000000004E0000
-        6  784:3932 0x01172FE5 ModuleInject                    ³     1000 RVA       1C SizeOfBlock
-        6  784:3932 0x01173063 ModuleInject                    ³          770 A 0000000000000348 -> 00000000004E0348
-        6  784:3932 0x01173063 ModuleInject                    ³          780 A 0000000000000396 -> 00000000004E0396
-        6  784:3932 0x01173063 ModuleInject                    ³          790 A 0000000000000396 -> 00000000004E0396
-        6  784:3932 0x01173063 ModuleInject                    ³          824 A 0000000000000478 -> 00000000004E0478
-        6  784:3932 0x01173063 ModuleInject                    ³          834 A 0000000000000498 -> 00000000004E0498
-        6  784:3932 0x01173063 ModuleInject                    ³          844 A 00000000000004B7 -> 00000000004E04B7
-        6  784:3932 0x01173063 ModuleInject                    ³          8D5 A 00000000000004F0 -> 00000000004E04F0
-        6  784:3932 0x01173063 ModuleInject                    ³          8E5 A 0000000000000567 -> 00000000004E0567
-        7  784:3932 0x01173063 ModuleInject                    ³          8F5 A 00000000000005A5 -> 00000000004E05A5
-        7  784:3932 0x01173063 ModuleInject                    ³          905 A 00000000000005C6 -> 00000000004E05C6
-        7  784:3932 0x011730E0 ModuleInject                   *³ Done
-        7  784:3932 0x004D02C0 DropperEntry                   ¯³ TEST DROPPER X32 STARTED
-        7  784:3932 0x004D0306 LdrLoadNtapi                   *³ Loading NTAPI
-        7  784:3932 0x004D0332 LdrLoadNtapi                    ³ ntdll.dll = 0x778F0000
-        7  784:3932 0x004D056A LdrGetProcAddressEx             ³ 77960600 CA67B978 NtAllocateVirtualMemory
-        7  784:3932 0x004D056A LdrGetProcAddressEx             ³ 77960570 6B372C05 NtClose
-        7  784:3932 0x004D056A LdrGetProcAddressEx             ³ 779609F0 A9C5B599 NtCreateFile
-        7  784:3932 0x004D056A LdrGetProcAddressEx             ³ 77961060 ED0594DA NtCreateThreadEx
-        7  784:3932 0x004D056A LdrGetProcAddressEx             ³ 77960700 5EA49A38 NtOpenProcess
-        7  784:3932 0x004D056A LdrGetProcAddressEx             ³ 77960800 7A43974A NtQuerySystemInformation
-        7  784:3932 0x004D056A LdrGetProcAddressEx             ³ 779604E0 A9E25A1D NtReadFile
-        7  784:3932 0x004D056A LdrGetProcAddressEx             ³ 77960500 F67464E4 NtWriteFile
-        7  784:3932 0x004D056A LdrGetProcAddressEx             ³ 77960840 43E32F32 NtWriteVirtualMemory
-        7  784:3932 0x004D039E LdrLoadNtapi                   *³ Done
-        7  784:3932 0x004D02DC DropperEntry                   ¯³ TEST DROPPER X32 STOPPED
-        0  784:3932 0x0000000000B7EE08 DropperEntry                   ¯³ TEST DROPPER X64 STARTED
-        1  784:3932 0x0000000000B7EDC8 LdrLoadNtapi                   *³ Loading NTAPI
-        1  784:3932 0x0000000000B7EDC8 LdrLoadNtapi                    ³ ntdll.dll = 0x00007FF9572A0000
-        1  784:3932 0x0000000000B7ED28 LdrGetProcAddressEx             ³ 00007FF95733F980 00000000CA67B978 NtAllocateVirtualMemory
-        1  784:3932 0x0000000000B7ED28 LdrGetProcAddressEx             ³ 00007FF95733F860 000000006B372C05 NtClose
-        1  784:3932 0x0000000000B7ED28 LdrGetProcAddressEx             ³ 00007FF957340120 00000000A9C5B599 NtCreateFile
-        1  784:3932 0x0000000000B7ED28 LdrGetProcAddressEx             ³ 00007FF957340DF0 00000000ED0594DA NtCreateThreadEx
-        1  784:3932 0x0000000000B7ED28 LdrGetProcAddressEx             ³ 00007FF95733FB40 000000005EA49A38 NtOpenProcess
-        1  784:3932 0x0000000000B7ED28 LdrGetProcAddressEx             ³ 00007FF95733FD40 000000007A43974A NtQuerySystemInformation
-        1  784:3932 0x0000000000B7ED28 LdrGetProcAddressEx             ³ 00007FF95733F740 00000000A9E25A1D NtReadFile
-        1  784:3932 0x0000000000B7ED28 LdrGetProcAddressEx             ³ 00007FF95733F780 00000000F67464E4 NtWriteFile
-        2  784:3932 0x0000000000B7ED28 LdrGetProcAddressEx             ³ 00007FF95733FDC0 0000000043E32F32 NtWriteVirtualMemory
-        2  784:3932 0x0000000000B7EDC8 LdrLoadNtapi                   *³ Done
-        2  784:3932 0x0000000000B7EE08 DropperEntry                   ¯³ TEST DROPPER X64 STOPPED
-        9  784:3932 0x0117347C TestDropperStart               +³ Stack is OK!
+        0 1936:7676 0x013D36FD ConfigIsProcessorCompatible    *³ Checking if processor is supported
+        0 1936:7676 0x013D37C4 ConfigIsProcessorCompatible     ³ Vendor: "GenuineIntel" (EBX:756E6547 EDX:49656E69 ECX:6C65746E)
+        0 1936:7676 0x013D3838 ConfigIsProcessorCompatible     ³ Config.Cpu.bIntel      = 1
+        0 1936:7676 0x013D3855 ConfigIsProcessorCompatible     ³ Config.Cpu.bAmd        = 0
+        0 1936:7676 0x013D3872 ConfigIsProcessorCompatible     ³ Config.Cpu.bUnderWow64 = 43
+        0 1936:7676 0x013D3889 ConfigIsProcessorCompatible    *³ Done
+        0 1936:7676 0x013D38A0 ConfigIsHyperVisorSupported    *³ Checking if hypervisor is supported
+        0 1936:7676 0x013D3A48 ConfigIsHyperVisorSupported     ³ Not present
+        0 1936:7676 0x013D3A5F ConfigIsWindowsSupported       *³ Checking if windows is supported
+        1 1936:7676 0x013D3AA7 ConfigIsNtVersionSupported      ³ NT Version: 10.0 Build:17763
+        1 1936:7676 0x013D3C02 ConfigIsNtVersionSupported      ³ Config.NtVersion.dwCommonIndex = 9
+        1 1936:7676 0x013D3CF1 ConfigIsWindowsSupported       *³ Done
+        1 1936:7676 0x013D2CD8 LdrLoadNtapi                   *³ Loading NTAPI
+        1 1936:7676 0x013D2DC2 LdrLoadNtapi                   *³ Done
+        1 1936:7676 0x013D3545 InitCrc32                      *³ Initializing CRC32
+        1 1936:7676 0x013D3565 InitCrc32                       ³ Using CRC32 instructions
+        1 1936:7676 0x013D358F InitCrc32                      *³ Done
+        1 1936:7676 0x013D2E9D CreateInstance                 *³ Creating a instance
+        1 1936:7676 0x013D2EE1 CreateInstance                  ³ Seed  : 0xF3FC4016
+        1 1936:7676 0x013D30FF CreateInstance                  ³ Mutant: \BaseNamedObjects\C9002904-F168-36A2-C593278AAAF2
+        1 1936:7676 0x013D3197 CreateInstance                 *³ Done
+        1 1936:7676 0x013D35F4 InitialEntry                    ³ Second stage of InitialEntrySplitted started!
+        1 1936:7676 0x013D34B8 DecoyEntry                     *³ Loading ws2_32.dll
+        1 1936:7676 0x013D34E5 DecoyEntry                     *³ Done
+        0 1936:8228 0x013D363C InitAes                        *³ Initializing AES
+        0 1936:8228 0x013D3660 InitAes                         ³ Using the slow method
+        0 1936:8228 0x013D36BE InitAes                        *³ Done
+        0 1936:8228 0x013D3285 ExecuteDropper                 *³ Injecting dropper
+        0 1936:8228 0x013D3318 ExecuteDropper                  ³ Address: 0x009B0000 Compressed: 3970 B Decompressed: 8192 B
+        0 1936:8228 0x013D3345 ExecuteDropper                  ³        0 RVA       1C SizeOfBlock
+        0 1936:8228 0x013D33C5 ExecuteDropper                  ³          C68 A 0000000000000E00 -> 00000000009B0E00
+        0 1936:8228 0x013D33C5 ExecuteDropper                  ³          EF0 A 0000000000000FA4 -> 00000000009B0FA4
+        0 1936:8228 0x013D33C5 ExecuteDropper                  ³          EF8 A 0000000000000FB0 -> 00000000009B0FB0
+        0 1936:8228 0x013D33C5 ExecuteDropper                  ³          F00 A 0000000000000FBC -> 00000000009B0FBC
+        0 1936:8228 0x013D33C5 ExecuteDropper                  ³          F08 A 0000000000000FCC -> 00000000009B0FCC
+        0 1936:8228 0x013D33C5 ExecuteDropper                  ³          F10 A 0000000000000FE0 -> 00000000009B0FE0
+        0 1936:8228 0x013D33C5 ExecuteDropper                  ³          F18 A 0000000000000FF8 -> 00000000009B0FF8
+        0 1936:8228 0x013D33C5 ExecuteDropper                  ³          F20 A 0000000000001000 -> 00000000009B1000
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          F30 A 0000000000000F90 -> 00000000009B0F90
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³            0 0 0000000000000000 -> 00000000009B0000
+        1 1936:8228 0x013D3345 ExecuteDropper                  ³     1000 RVA       20 SizeOfBlock
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          6B0 A 0000000000000310 -> 00000000009B0310
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          6C0 A 0000000000000337 -> 00000000009B0337
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          6D0 A 0000000000000337 -> 00000000009B0337
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          6E0 A 00000000000003BB -> 00000000009B03BB
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          6F0 A 00000000000003BB -> 00000000009B03BB
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          7A3 A 00000000000004A0 -> 00000000009B04A0
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          7B3 A 0000000000000504 -> 00000000009B0504
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          7C3 A 000000000000053A -> 00000000009B053A
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          7D3 A 0000000000000560 -> 00000000009B0560
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          874 A 00000000000005B8 -> 00000000009B05B8
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          884 A 00000000000005D8 -> 00000000009B05D8
+        1 1936:8228 0x013D33C5 ExecuteDropper                  ³          894 A 00000000000005F7 -> 00000000009B05F7
+        1 1936:8228 0x013D3445 ExecuteDropper                  ³ Executing dropper
+        0 1936:8228 0x0000000000ECF0E8 LdrLoadNtapi                   *³ Loading NTAPI
+        0 1936:8228 0x0000000000ECF0E8 LdrLoadNtapi                   *³ Done
+        1 1936:8228 0x013D348C ExecuteDropper                 *³ Done
