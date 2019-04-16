@@ -19,7 +19,7 @@ _KiJumpLongMode@8:
 	add  r14, 4
 	mov  dword [0x3C + r13], r8d
 	mov  dword [0x48 + r13], r14d
-	lea  r11, [r14+4]
+	lea  r11, [r14 + 4]
 	mov  dword [0x20 + r13], edi
 	mov  dword [0x24 + r13], esi
 	mov  dword [0x28 + r13], ebx
