@@ -1,7 +1,7 @@
-#include <crypto\init.h>
-#include <crypto\crc32.h>
-#include <crypto\aes.h>
-#include <crypto\aeskey.h>
+#include <init.h>
+#include <crc32.h>
+#include <aes.h>
+#include <aeskey.h>
 #include <core\cpu.h>
 #include <core\config.h>
 #include <core\console.h>

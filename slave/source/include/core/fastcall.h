@@ -10,4 +10,10 @@ VOID
 FASTCALLSTUB
 KiFastSystemCall(VOID);
 
+ULONG64
+FASTCALLSTUB
+KiJumpLongMode(
+    IN PVOID64 Address
+    );
+
 #endif

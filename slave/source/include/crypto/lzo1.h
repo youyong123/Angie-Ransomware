@@ -5,8 +5,7 @@ VOID
 Lzo1Decompress(
     IN  PVOID   Source,
     IN  SIZE_T  cbSource,
-    OUT PVOID   Destination,
-    OUT PSIZE_T cbDestination
+    OUT PVOID   Destination
     );
 
 #endif

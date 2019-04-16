@@ -9,9 +9,7 @@ CONST VOLATILE DWORD NtapiSyscallsNamesHashXorKey = XOR_KEY;
 
 DWORD NtapiSyscallsNamesHash[] = {
     0xCA67B978 ^ XOR_KEY, // NtAllocateVirtualMemory
-    0xB51CC567 ^ XOR_KEY, // NtFreeVirtualMemory
     0xED0594DA ^ XOR_KEY, // NtCreateThreadEx
-    0xA9C5B599 ^ XOR_KEY, // NtCreateFile
     0x6B372C05 ^ XOR_KEY, // NtClose
     0xB06BF858 ^ XOR_KEY, // NtCreateMutant
     0x13677D9C ^ XOR_KEY, // NtOpenMutant
@@ -22,9 +20,7 @@ DWORD NtapiSyscallsNamesHash[] = {
 
 FARPROC NtapiSyscallsAddressStorage[] = {
     (PVOID)RTLP_LCG_NATIVE, // NtAllocateVirtualMemory
-    (PVOID)RTLP_LCG_NATIVE, // NtFreeVirtualMemory
     (PVOID)RTLP_LCG_NATIVE, // NtCreateThreadEx
-    (PVOID)RTLP_LCG_NATIVE, // NtCreateFile
     (PVOID)RTLP_LCG_NATIVE, // NtClose
     (PVOID)RTLP_LCG_NATIVE, // NtCreateMutant
     (PVOID)RTLP_LCG_NATIVE, // NtOpenMutant

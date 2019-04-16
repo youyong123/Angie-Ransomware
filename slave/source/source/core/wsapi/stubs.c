@@ -1,5 +1,5 @@
 #include <wsasdk.h>
-#include <core\wsapi.h>
+#include <wsapi.h>
 #include "wsapi.h"
 
 enum {

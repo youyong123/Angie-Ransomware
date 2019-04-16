@@ -2,26 +2,26 @@
 #define __INCLUDE_CORE_CONFIG_H
 
 typedef union _CONFIG {
-    DWORD dwParts[10];
+    DWORD dwParts[14];
 
     struct {
         struct {
-            BOOLEAN bHV;
-            BOOLEAN bSSE5; // SSE4.2
-            BOOLEAN bSSE4; // SSE4.1
-            BOOLEAN bSSE3;
+            BOOL bHV;
+            BOOL bSSE5; // SSE4.2
+            BOOL bSSE4; // SSE4.1
+            BOOL bSSE3;
+            BOOL bAES;
         } Features;
 
         struct {
-            BOOLEAN bIntel;
-            BOOLEAN bAmd;
-            BOOLEAN bUnderWow64;
-            BOOLEAN bLongMode; // CPU mode state
+            BOOL bIntel;
+            BOOL bAmd;
+            BOOL bUnderWow64;
         } Cpu;
 
         struct {
             union {
-                union {
+                struct {
                     BOOLEAN     bMicrosoft;
                     BOOLEAN     bVmware;
                     BOOLEAN NON bPadding;
@@ -39,11 +39,6 @@ typedef union _CONFIG {
             BOOL      bIsDeprecated;
             ULONG     dwCommonIndex;
         } NtVersion;
-
-        struct {
-            WORD  wLongModeSelector;
-            WORD  wLegacyModeSelector;
-        } Os;
     };
 } CONFIG, *PCONFIG;
 

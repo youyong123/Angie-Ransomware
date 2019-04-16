@@ -1,5 +1,5 @@
-#include <core\instance.h>
-#include <core\ntapi.h>
+#include <instance.h>
+#include <ntapi.h>
 #include <crypto\crc32.h>
 #include <crypto\xorshift.h>
 
@@ -44,7 +44,7 @@ CreateInstance(VOID)
     WCHAR sAsciiHex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
     PUNICODE_STRING ImagePathName = (PVOID)&RtlpGetUserProcessParameters()->ImagePathName;
 
-    #if SCFG_DROPPER_INSTANCE_USE_SEED_SALT == ON
+    #if SCFG_CORE_INSTANCE_USE_SEED_SALT == ON
         ULONG dwSeed = Crc32SumBuffer(ImagePathName->Buffer, ImagePathName->Length) ^ RTLP_LCG_DWORD;
     #else
         ULONG dwSeed = Crc32SumBuffer(ImagePathName->Buffer, ImagePathName->Length);
@@ -111,7 +111,7 @@ CreateInstance(VOID)
 
         return FALSE;
     }
-
+    
     Object.Attributes = 0;
 
     if (NT_ERROR(NtCreateMutant(&InstanceMutantObject, STANDARD_RIGHTS_ALL | FILE_READ_DATA, &Object, TRUE))) {

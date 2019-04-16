@@ -1,9 +1,10 @@
 #define INCL_WINSOCK_API_PROTOTYPES 1
 
 #include <wsasdk.h>
-#include <decoy\entry.h>
+#include <entry.h>
 
 ULONG
+WINAPI
 DecoyEntry(VOID)
 {
     $DLOG1(DLG_FLT_INFO, "Loading ws2_32.dll");

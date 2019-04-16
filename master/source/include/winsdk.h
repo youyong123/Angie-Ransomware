@@ -46,7 +46,11 @@
 #define NON
 #define OPT
 
-#undef VOID
+#ifdef __INTELLISENSE__
+    #undef VOID
+
+    typedef void VOID;
+#endif
 
 #define __TOTEXT(X) #X
 #define TOTEXT(X)   __TOTEXT(X)
@@ -73,6 +77,11 @@
 #define FASTDIV8(X)  ((X) >> 3)
 #define FASTDIV16(X) ((X) >> 4)
 
+#define FASTMOD2(X)  ((X) & 0x1)
+#define FASTMOD4(X)  ((X) & 0x3)
+#define FASTMOD8(X)  ((X) & 0x7)
+#define FASTMOD16(X) ((X) & 0xF)
+
 #define MAKELONG64(L, H) ((ULONG64)(((ULONG32)(L)) | ((ULONG64)H) << 32))
 
 typedef ULONG64 QWORD, *PQWORD;
@@ -95,7 +104,6 @@ typedef ULONG_PTR   DWORD_PTR,   *PDWORD_PTR;
 typedef ULONG64_PTR DWORD64_PTR, *PDWORD64_PTR;
 typedef ULONG32_PTR DWORD32_PTR, *PDWORD32_PTR;
 
-typedef void       VOID;
 typedef const void CVOID;
 
 typedef VOID  *PVOID;

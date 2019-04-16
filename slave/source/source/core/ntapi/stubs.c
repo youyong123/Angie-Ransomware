@@ -1,13 +1,13 @@
-#include <core\config.h>
-#include <core\fastcall.h>
-#include <core\ntapi.h>
+#include <config.h>
+#include <fastcall.h>
+#include <ntapi.h>
 #include "ntapi.h"
 
 enum {
     Teb32Wow64ReservedOffset = FIELD_OFFSET(TEB32, WOW32Reserved)
 };
 
-#if SCFG_DROPPER_NTAPI_INIT_USE_PROCLOAD == ON
+#if SCFG_CORE_NTAPI_INIT_USE_PROCLOAD == ON
     #define NTAPI_STUB_SOURCE(PROCINDEX, ARGSIZE)                                \
         {                                                                        \
             __asm { jmp dword ptr NtapiSyscallsAddressStorage[PROCINDEX << 2] }; \
@@ -20,17 +20,17 @@ enum {
     */
     #define NTAPI_STUB_SOURCE(PROCINDEX, ARGSIZE)                                     \
         {                                                                             \
-            __asm { cmp byte ptr [Config.NtVersion.bIsDeprecated], TRUE            }; \
+            __asm { cmp dword ptr [Config.NtVersion.bIsDeprecated], TRUE           }; \
             __asm { jne L1                                                         }; \
             __asm { jmp dword ptr NtapiSyscallsAddressStorage[PROCINDEX << 2]      }; \
         L1:                                                                           \
             __asm { mov eax, dword ptr NtapiSyscallsAddressStorage[PROCINDEX << 2] }; \
-            __asm { cmp byte ptr [Config.Cpu.bUnderWow64], TRUE                    }; \
-            __asm { je L2                                                          }; \
+            __asm { and dword ptr [Config.Cpu.bUnderWow64], 0xFFFFFFFF             }; \
+            __asm { jnz L2                                                         }; \
             __asm { call KiFastSystemCall                                          }; \
             __asm { ret ARGSIZE                                                    }; \
         L2:                                                                           \
-            __asm { cmp byte ptr [Config.NtVersion.dwCommonIndex], 0               }; \
+            __asm { cmp dword ptr [Config.NtVersion.dwCommonIndex], 0              }; \
             __asm { je L3                                                          }; \
             __asm { call dword ptr fs:[Teb32Wow64ReservedOffset]                   }; \
             __asm { ret ARGSIZE                                                    }; \
@@ -61,18 +61,6 @@ NtAllocateVirtualMemory(
 
 NTSTATUS
 NTAPISTUB
-NtFreeVirtualMemory(
-    IN HANDLE   ProcessHandle,
-    IN PVOID   *BaseAddress,
-    IO PSIZE_T  RegionSize,
-    IN ULONG    FreeType
-    )
-{
-    NTAPI_STUB_SOURCE(__COUNTER__, 0x10);
-}
-
-NTSTATUS
-NTAPISTUB
 NtCreateThreadEx(
     OUT     HANDLE      hThread,
     IN      ACCESS_MASK DesiredAccess,
@@ -85,25 +73,6 @@ NtCreateThreadEx(
     IN      ULONG       SizeOfStackCommit,
     IN      ULONG       SizeOfStackReserve,
     IN  OPT PPS_ATTRIBUTE_LIST AttributeList
-    )
-{
-    NTAPI_STUB_SOURCE(__COUNTER__, 0x2C);
-}
-
-NTSTATUS
-NTAPISTUB
-NtCreateFile(
-    OUT PHANDLE            FileHandle,
-    IN  ACCESS_MASK        DesiredAccess,
-    IN  POBJECT_ATTRIBUTES ObjectAttributes,
-    OUT PIO_STATUS_BLOCK   IoStatusBlock,
-    IN  PLARGE_INTEGER     AllocationSize,
-    IN  ULONG              FileAttributes,
-    IN  ULONG              ShareAccess,
-    IN  ULONG              CreateDisposition,
-    IN  ULONG              CreateOptions,
-    IN  PVOID              EaBuffer,
-    IN  ULONG              EaLength
     )
 {
     NTAPI_STUB_SOURCE(__COUNTER__, 0x2C);

@@ -1,4 +1,4 @@
-#include <core\cpu.h>
+#include <cpu.h>
 
 enum {
     /* ECX */

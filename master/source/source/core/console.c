@@ -1,5 +1,5 @@
-#include <core\ntapi.h>
-#include <core\console.h>
+#include <ntapi.h>
+#include <console.h>
 
 HANDLE ConsoleHandle;
 PVOID  Buffer;

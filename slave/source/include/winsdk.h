@@ -53,17 +53,19 @@
 #include <winbase.h>
 #include <no_sal2.h>
 
+#ifdef __INTELLISENSE__
+    #undef VOID
+
+    typedef void VOID;
+#endif
+
 #define IO
 #define NON
 #define OPT
 
-#undef VOID
 #undef NULL
 #undef INVALID_HANDLE_VALUE
 #undef DECLARE_HANDLE
-
-typedef void VOID;
-typedef const void CVOID;
 
 #define FASTMUL2(X)  ((X) << 1)
 #define FASTMUL4(X)  ((X) << 2)
@@ -74,6 +76,11 @@ typedef const void CVOID;
 #define FASTDIV4(X)  ((X) >> 2)
 #define FASTDIV8(X)  ((X) >> 3)
 #define FASTDIV16(X) ((X) >> 4)
+
+#define FASTMOD2(X)  ((X) & 0x1)
+#define FASTMOD4(X)  ((X) & 0x3)
+#define FASTMOD8(X)  ((X) & 0x7)
+#define FASTMOD16(X) ((X) & 0xF)
 
 #define __TOTEXT(X) #X
 #define TOTEXT(X)   __TOTEXT(X)
@@ -115,7 +122,6 @@ typedef ULONG_PTR   DWORD_PTR,   *PDWORD_PTR;
 typedef ULONG64_PTR DWORD64_PTR, *PDWORD64_PTR;
 typedef ULONG32_PTR DWORD32_PTR, *PDWORD32_PTR;
 
-typedef void        VOID;
 typedef const void  CVOID;
 
 typedef VOID *      PVOID;
@@ -778,6 +784,188 @@ typedef struct _KEY_VALUE_PARTIAL_INFORMATION {
     ULONG DataLength;
     UCHAR Data[1];
 } KEY_VALUE_PARTIAL_INFORMATION, *PKEY_VALUE_PARTIAL_INFORMATION;
+
+typedef VOID IO_APC_ROUTINE, *PIO_APC_ROUTINE;
+
+/* TODO: cleanup */
+typedef enum _SYSTEM_INFORMATION_CLASS {
+    SystemBasicInformation,                       // : SYSTEM_BASIC_INFORMATION
+    SystemProcessorInformation,                   // : SYSTEM_PROCESSOR_INFORMATION
+    SystemPerformanceInformation,                 // : SYSTEM_PERFORMANCE_INFORMATION
+    SystemTimeOfDayInformation,                   // : SYSTEM_TIMEOFDAY_INFORMATION
+    SystemPathInformation,                        // not implemented
+    SystemProcessInformation,                     // : SYSTEM_PROCESS_INFORMATION
+    SystemCallCountInformation,                   // : SYSTEM_CALL_COUNT_INFORMATION
+    SystemDeviceInformation,                      // : SYSTEM_DEVICE_INFORMATION
+    SystemProcessorPerformanceInformation,        // : SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION
+    SystemFlagsInformation,                       // : SYSTEM_FLAGS_INFORMATION
+    SystemCallTimeInformation,                    // 10, not implemented
+    SystemModuleInformation,                      // : RTL_PROCESS_MODULES
+    SystemLocksInformation,
+    SystemStackTraceInformation,
+    SystemPagedPoolInformation,                   // not implemented
+    SystemNonPagedPoolInformation,                // not implemented
+    SystemHandleInformation,                      // : SYSTEM_HANDLE_INFORMATION
+    SystemObjectInformation,                      // : SYSTEM_OBJECTTYPE_INFORMATION mixed with SYSTEM_OBJECT_INFORMATION
+    SystemPageFileInformation,                    // : SYSTEM_PAGEFILE_INFORMATION
+    SystemVdmInstemulInformation,
+    SystemVdmBopInformation,                      // 20, not implemented
+    SystemFileCacheInformation,                   // : SYSTEM_FILECACHE_INFORMATION; s (requires SeIncreaseQuotaPrivilege) (info for WorkingSetTypeSystemCache)
+    SystemPoolTagInformation,                     // : SYSTEM_POOLTAG_INFORMATION
+    SystemInterruptInformation,                   // : SYSTEM_INTERRUPT_INFORMATION
+    SystemDpcBehaviorInformation,                 // : SYSTEM_DPC_BEHAVIOR_INFORMATION; s: SYSTEM_DPC_BEHAVIOR_INFORMATION (requires SeLoadDriverPrivilege)
+    SystemFullMemoryInformation,                  // not implemented
+    SystemLoadGdiDriverInformation,               // s (kernel-mode only)
+    SystemUnloadGdiDriverInformation,             // s (kernel-mode only)
+    SystemTimeAdjustmentInformation,              // : SYSTEM_QUERY_TIME_ADJUST_INFORMATION; s: SYSTEM_SET_TIME_ADJUST_INFORMATION (requires SeSystemtimePrivilege)
+    SystemSummaryMemoryInformation,               // not implemented
+    SystemMirrorMemoryInformation,                // 30, s (requires license value "Kernel-MemoryMirroringSupported") (requires SeShutdownPrivilege)
+    SystemPerformanceTraceInformation,            // s
+    SystemObsolete0,                              // not implemented
+    SystemExceptionInformation,                   // : SYSTEM_EXCEPTION_INFORMATION
+    SystemCrashDumpStateInformation,              // s (requires SeDebugPrivilege)
+    SystemKernelDebuggerInformation,              // : SYSTEM_KERNEL_DEBUGGER_INFORMATION
+    SystemContextSwitchInformation,               // : SYSTEM_CONTEXT_SWITCH_INFORMATION
+    SystemRegistryQuotaInformation,               // : SYSTEM_REGISTRY_QUOTA_INFORMATION; s (requires SeIncreaseQuotaPrivilege)
+    SystemExtendServiceTableInformation,          // s (requires SeLoadDriverPrivilege) // loads win32k only
+    SystemPrioritySeperation,                     // s (requires SeTcbPrivilege)
+    SystemVerifierAddDriverInformation,           // 40, s (requires SeDebugPrivilege)
+    SystemVerifierRemoveDriverInformation,        // s (requires SeDebugPrivilege)
+    SystemProcessorIdleInformation,               // : SYSTEM_PROCESSOR_IDLE_INFORMATION
+    SystemLegacyDriverInformation,                // : SYSTEM_LEGACY_DRIVER_INFORMATION
+    SystemCurrentTimeZoneInformation,
+    SystemLookasideInformation,                   // : SYSTEM_LOOKASIDE_INFORMATION
+    SystemTimeSlipNotification,                   // s (requires SeSystemtimePrivilege)
+    SystemSessionCreate,                          // not implemented
+    SystemSessionDetach,                          // not implemented
+    SystemSessionInformation,                     // not implemented
+    SystemRangeStartInformation,                  // 50, q
+    SystemVerifierInformation,                    // : SYSTEM_VERIFIER_INFORMATION; s (requires SeDebugPrivilege)
+    SystemVerifierThunkExtend,                    // s (kernel-mode only)
+    SystemSessionProcessInformation,              // : SYSTEM_SESSION_PROCESS_INFORMATION
+    SystemLoadGdiDriverInSystemSpace,             // s (kernel-mode only) (same as SystemLoadGdiDriverInformation)
+    SystemNumaProcessorMap,
+    SystemPrefetcherInformation,                  // : PREFETCHER_INFORMATION; s: PREFETCHER_INFORMATION // PfSnQueryPrefetcherInformation
+    SystemExtendedProcessInformation,             // : SYSTEM_PROCESS_INFORMATION
+    SystemRecommendedSharedDataAlignment,
+    SystemComPlusPackage,                         // ; s
+    SystemNumaAvailableMemory,                    // 60
+    SystemProcessorPowerInformation,              // : SYSTEM_PROCESSOR_POWER_INFORMATION
+    SystemEmulationBasicInformation,
+    SystemEmulationProcessorInformation,
+    SystemExtendedHandleInformation,              // : SYSTEM_HANDLE_INFORMATION_EX
+    SystemLostDelayedWriteInformation,            // : ULONG
+    SystemBigPoolInformation,                     // : SYSTEM_BIGPOOL_INFORMATION
+    SystemSessionPoolTagInformation,              // : SYSTEM_SESSION_POOLTAG_INFORMATION
+    SystemSessionMappedViewInformation,           // : SYSTEM_SESSION_MAPPED_VIEW_INFORMATION
+    SystemHotpatchInformation,                    // ; s
+    SystemObjectSecurityMode,                     // 70, q
+    SystemWatchdogTimerHandler,                   // s (kernel-mode only)
+    SystemWatchdogTimerInformation,               // (kernel-mode only); s (kernel-mode only)
+    SystemLogicalProcessorInformation,            // : SYSTEM_LOGICAL_PROCESSOR_INFORMATION
+    SystemWow64SharedInformationObsolete,         // not implemented
+    SystemRegisterFirmwareTableInformationHandler,// s (kernel-mode only)
+    SystemFirmwareTableInformation,               // not implemented
+    SystemModuleInformationEx,                    // : RTL_PROCESS_MODULE_INFORMATION_EX
+    SystemVerifierTriageInformation,              // not implemented
+    SystemSuperfetchInformation,                  // : SUPERFETCH_INFORMATION; s: SUPERFETCH_INFORMATION // PfQuerySuperfetchInformation
+    SystemMemoryListInformation,                  // 80, q: SYSTEM_MEMORY_LIST_INFORMATION; s: SYSTEM_MEMORY_LIST_COMMAND (requires SeProfileSingleProcessPrivilege)
+    SystemFileCacheInformationEx,                 // : SYSTEM_FILECACHE_INFORMATION; s (requires SeIncreaseQuotaPrivilege) (same as SystemFileCacheInformation)
+    SystemThreadPriorityClientIdInformation,      // s: SYSTEM_THREAD_CID_PRIORITY_INFORMATION (requires SeIncreaseBasePriorityPrivilege)
+    SystemProcessorIdleCycleTimeInformation,      // : SYSTEM_PROCESSOR_IDLE_CYCLE_TIME_INFORMATION[]
+    SystemVerifierCancellationInformation,        // not implemented // name:wow64:whNT32QuerySystemVerifierCancellationInformation
+    SystemProcessorPowerInformationEx,            // not implemented
+    SystemRefTraceInformation,                    // ; s // ObQueryRefTraceInformation
+    SystemSpecialPoolInformation,                 // ; s (requires SeDebugPrivilege) // MmSpecialPoolTag, then MmSpecialPoolCatchOverruns != 0
+    SystemProcessIdInformation,                   // : SYSTEM_PROCESS_ID_INFORMATION
+    SystemErrorPortInformation,                   // s (requires SeTcbPrivilege)
+    SystemBootEnvironmentInformation,             // 90, q: SYSTEM_BOOT_ENVIRONMENT_INFORMATION
+    SystemHypervisorInformation,                  // ; s (kernel-mode only)
+    SystemVerifierInformationEx,                  // ; s
+    SystemTimeZoneInformation,                    // s (requires SeTimeZonePrivilege)
+    SystemImageFileExecutionOptionsInformation,   // s: SYSTEM_IMAGE_FILE_EXECUTION_OPTIONS_INFORMATION (requires SeTcbPrivilege)
+    SystemCoverageInformation,                    // ; s // name:wow64:whNT32QuerySystemCoverageInformation; ExpCovQueryInformation
+    SystemPrefetchPatchInformation,               // not implemented
+    SystemVerifierFaultsInformation,              // s (requires SeDebugPrivilege)
+    SystemSystemPartitionInformation,             // : SYSTEM_SYSTEM_PARTITION_INFORMATION
+    SystemSystemDiskInformation,                  // : SYSTEM_SYSTEM_DISK_INFORMATION
+    SystemProcessorPerformanceDistribution,       // 100, q: SYSTEM_PROCESSOR_PERFORMANCE_DISTRIBUTION
+    SystemNumaProximityNodeInformation,
+    SystemDynamicTimeZoneInformation,             // ; s (requires SeTimeZonePrivilege)
+    SystemCodeIntegrityInformation,               // // SeCodeIntegrityQueryInformation
+    SystemProcessorMicrocodeUpdateInformation,    // s
+    SystemProcessorBrandString,                   // // HaliQuerySystemInformation -> HalpGetProcessorBrandString, info class 23
+    SystemVirtualAddressInformation,              // : SYSTEM_VA_LIST_INFORMATION[]; s: SYSTEM_VA_LIST_INFORMATION[] (requires SeIncreaseQuotaPrivilege) // MmQuerySystemVaInformation
+    SystemLogicalProcessorAndGroupInformation,    // : SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX // since WIN7 // KeQueryLogicalProcessorRelationship
+    SystemProcessorCycleTimeInformation,          // : SYSTEM_PROCESSOR_CYCLE_TIME_INFORMATION[]
+    SystemStoreInformation,                       // ; s // SmQueryStoreInformation
+    SystemRegistryAppendString,                   // 110, s: SYSTEM_REGISTRY_APPEND_STRING_PARAMETERS
+    SystemAitSamplingValue,                       // s: ULONG (requires SeProfileSingleProcessPrivilege)
+    SystemVhdBootInformation,                     // : SYSTEM_VHD_BOOT_INFORMATION
+    SystemCpuQuotaInformation,                    // ; s // PsQueryCpuQuotaInformation
+    SystemNativeBasicInformation,                 // not implemented
+    SystemSpare1,                                 // not implemented
+    SystemLowPriorityIoInformation,               // : SYSTEM_LOW_PRIORITY_IO_INFORMATION
+    SystemTpmBootEntropyInformation,              // : TPM_BOOT_ENTROPY_NT_RESULT // ExQueryTpmBootEntropyInformation
+    SystemVerifierCountersInformation,            // : SYSTEM_VERIFIER_COUNTERS_INFORMATION
+    SystemPagedPoolInformationEx,                 // : SYSTEM_FILECACHE_INFORMATION; s (requires SeIncreaseQuotaPrivilege) (info for WorkingSetTypePagedPool)
+    SystemSystemPtesInformationEx,                // 120, q: SYSTEM_FILECACHE_INFORMATION; s (requires SeIncreaseQuotaPrivilege) (info for WorkingSetTypeSystemPtes)
+    SystemNodeDistanceInformation,
+    SystemAcpiAuditInformation,                   // : SYSTEM_ACPI_AUDIT_INFORMATION // HaliQuerySystemInformation -> HalpAuditQueryResults, info class 26
+    SystemBasicPerformanceInformation,            // : SYSTEM_BASIC_PERFORMANCE_INFORMATION // name:wow64:whNtQuerySystemInformation_SystemBasicPerformanceInformation
+    SystemQueryPerformanceCounterInformation,     // : SYSTEM_QUERY_PERFORMANCE_COUNTER_INFORMATION // since WIN7 SP1
+    SystemSessionBigPoolInformation,              // since WIN8
+    SystemBootGraphicsInformation,
+    SystemScrubPhysicalMemoryInformation,
+    SystemBadPageInformation,
+    SystemProcessorProfileControlArea,
+    SystemCombinePhysicalMemoryInformation,       // 130
+    SystemEntropyInterruptTimingCallback,
+    SystemConsoleInformation,
+    SystemPlatformBinaryInformation,
+    SystemThrottleNotificationInformation,
+    SystemHypervisorProcessorCountInformation,
+    SystemDeviceDataInformation,
+    SystemDeviceDataEnumerationInformation,
+    SystemMemoryTopologyInformation,
+    SystemMemoryChannelInformation,
+    SystemBootLogoInformation,                     // 140
+    SystemProcessorPerformanceInformationEx,       // : SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION_EX // since WINBLUE
+    SystemSpare0,
+    SystemSecureBootPolicyInformation,
+    SystemPageFileInformationEx,                   // : SYSTEM_PAGEFILE_INFORMATION_EX
+    SystemSecureBootInformation,
+    SystemEntropyInterruptTimingRawInformation,
+    SystemPortableWorkspaceEfiLauncherInformation,
+    SystemFullProcessInformation,                  // : SYSTEM_PROCESS_INFORMATION with SYSTEM_PROCESS_INFORMATION_EXTENSION (requires admin)
+    SystemKernelDebuggerInformationEx,             // : SYSTEM_KERNEL_DEBUGGER_INFORMATION_EX
+    SystemBootMetadataInformation,                 // 150
+    SystemSoftRebootInformation,
+    SystemElamCertificateInformation,
+    SystemOfflineDumpConfigInformation,
+    SystemProcessorFeaturesInformation,            // : SYSTEM_PROCESSOR_FEATURES_INFORMATION
+    SystemRegistryReconciliationInformation,
+    SystemEdidInformation,
+    SystemManufacturingInformation,                // : SYSTEM_MANUFACTURING_INFORMATION // since THRESHOLD
+    SystemEnergyEstimationConfigInformation,       // : SYSTEM_ENERGY_ESTIMATION_CONFIG_INFORMATION
+    SystemHypervisorDetailInformation,             // : SYSTEM_HYPERVISOR_DETAIL_INFORMATION
+    SystemProcessorCycleStatsInformation,          // : SYSTEM_PROCESSOR_CYCLE_STATS_INFORMATION // 160
+    SystemVmGenerationCountInformation,
+    SystemTrustedPlatformModuleInformation,        // : SYSTEM_TPM_INFORMATION
+    SystemKernelDebuggerFlags,
+    SystemCodeIntegrityPolicyInformation,
+    SystemIsolatedUserModeInformation,
+    SystemHardwareSecurityTestInterfaceResultsInformation,
+    SystemSingleModuleInformation,                 // : SYSTEM_SINGLE_MODULE_INFORMATION
+    SystemAllowedCpuSetsInformation,
+    SystemDmaProtectionInformation,
+    SystemInterruptCpuSetsInformation,
+    SystemSecureBootPolicyFullInformation,
+    SystemCodeIntegrityPolicyFullInformation,
+    SystemAffinitizedInterruptProcessorInformation,
+    SystemRootSiloInformation,                     // : SYSTEM_ROOT_SILO_INFORMATION
+    MaxSystemInfoClass
+} SYSTEM_INFORMATION_CLASS, *PSYSTEM_INFORMATION_CLASS;
 
 PRAGMA_WARNING_DISABLE_POP(344)
 

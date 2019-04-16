@@ -1,4 +1,4 @@
-#include <crypto\lzo1.h>
+#include <lzo1.h>
 
 #define RBITS  5
 #define CLEVEL 1
@@ -30,8 +30,7 @@ VOID
 Lzo1Decompress(
     IN  PVOID   Source,
     IN  SIZE_T  cbSource,
-    OUT PVOID   Destination,
-    OUT PSIZE_T cbDestination
+    OUT PVOID   Destination
     )
 {
     PBYTE sOut = Destination;
@@ -90,6 +89,4 @@ Lzo1Decompress(
             sOutIndex += y;
         }
     }
-
-    *cbDestination = (ULONG_PTR)sOut - (ULONG_PTR)Destination;
 }

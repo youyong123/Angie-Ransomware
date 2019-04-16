@@ -1,8 +1,0 @@
-#ifndef __INCLUDE_DROPPER_ENTRY_H
-#define __INCLUDE_DROPPER_ENTRY_H
-
-ULONG
-WINAPI
-DropperEntry(VOID);
-
-#endif

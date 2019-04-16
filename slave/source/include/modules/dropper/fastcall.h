@@ -1,0 +1,15 @@
+#ifndef __INCLUDE_MODULES_DROPPER_FASTCALL_H
+#define __INCLUDE_MODULES_DROPPER_FASTCALL_H
+
+#define FASTCALLSTUB  \
+    DECLSPEC_NAKED    \
+    DECLSPEC_NOINLINE \
+    NTAPI
+
+#ifdef _X86_
+    VOID
+    FASTCALLSTUB
+    KiFastSystemCall(VOID);
+#endif
+
+#endif

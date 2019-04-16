@@ -1,4 +1,4 @@
-#include <core\memory.h>
+#include <memory.h>
 
 HANDLE ProcessHeap;
 

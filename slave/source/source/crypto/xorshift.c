@@ -1,4 +1,4 @@
-#include <crypto\xorshift.h>
+#include <xorshift.h>
 
 DWORD
 Xorshift32Ex(

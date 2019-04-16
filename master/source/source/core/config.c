@@ -1,6 +1,6 @@
-#include <core\console.h>
-#include <core\config.h>
-#include <core\memory.h>
+#include <console.h>
+#include <config.h>
+#include <memory.h>
 #include <crypto\aes.h>
 
 /*

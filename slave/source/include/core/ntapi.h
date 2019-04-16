@@ -19,15 +19,6 @@ NtAllocateVirtualMemory(
 
 NTSTATUS
 NTAPISTUB
-NtFreeVirtualMemory(
-    IN HANDLE   ProcessHandle,
-    IN PVOID   *BaseAddress,
-    IO PSIZE_T  RegionSize,
-    IN ULONG    FreeType
-    );
-
-NTSTATUS
-NTAPISTUB
 NtCreateThreadEx(
     OUT     HANDLE      hThread,
     IN      ACCESS_MASK DesiredAccess,
@@ -40,22 +31,6 @@ NtCreateThreadEx(
     IN      ULONG       SizeOfStackCommit,
     IN      ULONG       SizeOfStackReserve,
     IN  OPT PPS_ATTRIBUTE_LIST AttributeList
-    );
-
-NTSTATUS
-NTAPISTUB
-NtCreateFile(
-    OUT PHANDLE            FileHandle,
-    IN  ACCESS_MASK        DesiredAccess,
-    IN  POBJECT_ATTRIBUTES ObjectAttributes,
-    OUT PIO_STATUS_BLOCK   IoStatusBlock,
-    IN  PLARGE_INTEGER     AllocationSize,
-    IN  ULONG              FileAttributes,
-    IN  ULONG              ShareAccess,
-    IN  ULONG              CreateDisposition,
-    IN  ULONG              CreateOptions,
-    IN  PVOID              EaBuffer,
-    IN  ULONG              EaLength
     );
 
 NTSTATUS
@@ -106,7 +81,5 @@ NtQueryValueKey(
     IN  ULONG                       Length,
     OUT PULONG                      ResultLength
     );
-
-#include <winreg.h>
 
 #endif
