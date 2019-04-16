@@ -33,7 +33,7 @@ _KiJumpLongMode@8:
 
 	mov  r14, rsp
 	mov  dword [0x04 + rsp], 0x23
-	mov  r8d, 0x2B ; selector
+	mov  r8d, 0x2B
 	mov  ss, r8w
 	mov  r9d, dword [0x3C + r13]
 	mov  dword [rsp], r9d
