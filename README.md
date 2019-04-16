@@ -17,5 +17,5 @@ http://sandpile.org
 
 ### Some images
 
-![image1](images/image01.png)
+![image1](images/image03.png)
 ![image1](images/image02.png)
