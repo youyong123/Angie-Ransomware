@@ -1,5 +1,6 @@
 #include <ldr.h>
 #include <ntapi.h>
+#include <fnv1a.h>
 
 
 static
@@ -7,18 +8,13 @@ VOID
 DECLSPEC_NOINLINE
 EnumProcessTest(VOID)
 {
-    /*NtQuerySystemInformation(
-        SystemHypervisorProcessorCountInformation
-    )*/
-
     NTSTATUS Status;
-
     SIZE_T cbProcessInformation = 0;
     PSYSTEM_PROCESS_INFORMATION ProcessInformation = NULL;
  
     if (RtlpGetPeb()->BeingDebugged) { __debugbreak(); }
 
-    NtQuerySystemInformation(SystemProcessInformation, NULL, 0, &cbProcessInformation);
+    NtQuerySystemInformation(SystemProcessInformation, NULL, 0, (PVOID)&cbProcessInformation);
 
     if (!cbProcessInformation) {
         $DLOG1(DLG_FLT_CRITICAL, "cbProcessInformation = 0");
@@ -36,17 +32,23 @@ EnumProcessTest(VOID)
 
     if (RtlpGetPeb()->BeingDebugged) { __debugbreak(); }
 
-    if (!NT_SUCCESS(Status = NtQuerySystemInformation(SystemProcessInformation, (PVOID)ProcessInformation, cbProcessInformation, &cbProcessInformation))) {
+    if (!NT_SUCCESS(Status = NtQuerySystemInformation(SystemProcessInformation, (PVOID)ProcessInformation, cbProcessInformation, (PVOID)&cbProcessInformation))) {
         $DLOG1(DLG_FLT_CRITICAL, "NtQuerySystemInformation %08lX", Status);
 
         return;
     }
 
     for (; ProcessInformation->NextEntryOffset; ProcessInformation = (PVOID)((ULONG_PTR)ProcessInformation + ProcessInformation->NextEntryOffset)) {
+        DWORD dwSumName = 0;
+
+        if (ProcessInformation->ImageName.Length) {
+            dwSumName = Fnv1AHashStringW(ProcessInformation->ImageName.Buffer);
+        }
+
         #ifdef _AMD64_
-            $DLOG1(DLG_FLT_HIGHLIGHT, "% 5I64u %ls", ProcessInformation->UniqueProcessId, ProcessInformation->ImageName.Buffer);
+            $DLOG1(DLG_FLT_HIGHLIGHT, "% 5I64u %08lX %ls", ProcessInformation->UniqueProcessId, dwSumName, ProcessInformation->ImageName.Buffer);
         #else
-            $DLOG1(DLG_FLT_HIGHLIGHT, "% 5lu %ls", ProcessInformation->UniqueProcessId, ProcessInformation->ImageName.Buffer);
+            $DLOG1(DLG_FLT_HIGHLIGHT, "% 5lu %08lX %ls", ProcessInformation->UniqueProcessId, dwSumName, ProcessInformation->ImageName.Buffer);
         #endif
     }
 }
