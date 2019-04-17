@@ -14,6 +14,7 @@ DWORD NtapiSyscallsNamesHash[] = {
     0xED0594DA ^ XOR_KEY, // NtCreateThreadEx
     0x5EA49A38 ^ XOR_KEY, // NtOpenProcess
     0x7A43974A ^ XOR_KEY, // NtQuerySystemInformation
+    0x08AC8BAC ^ XOR_KEY, // NtDeviceIoControlFile
     0xF67464E4 ^ XOR_KEY, // NtWriteFile
     0xA9E25A1D ^ XOR_KEY, // NtReadFile
     0xA9C5B599 ^ XOR_KEY, // NtCreateFile
@@ -27,6 +28,7 @@ FARPROC NtapiSyscallsAddressStorage[] = {
     (PVOID)RTLP_LCG_NATIVE, // NtCreateThreadEx
     (PVOID)RTLP_LCG_NATIVE, // NtOpenProcess
     (PVOID)RTLP_LCG_NATIVE, // NtQuerySystemInformation
+    (PVOID)RTLP_LCG_NATIVE, // NtDeviceIoControlFile
     (PVOID)RTLP_LCG_NATIVE, // NtWriteFile
     (PVOID)RTLP_LCG_NATIVE, // NtReadFile
     (PVOID)RTLP_LCG_NATIVE, // NtCreateFile
