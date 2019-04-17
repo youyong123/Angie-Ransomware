@@ -1,3 +1,6 @@
 *.obj
 *.pdb
 *.map
+*.exp
+*.ignore
+.vs
