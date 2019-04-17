@@ -12,7 +12,7 @@ LdrGetModule(
 {
     PPEB Peb = RtlpGetPeb();
     PLDR_DATA_TABLE_ENTRY Index = (PVOID)((PPEB_LDR_DATA)Peb->Ldr)->InLoadOrderModuleList.Flink;
-    PLDR_DATA_TABLE_ENTRY End   = Index;
+    PLDR_DATA_TABLE_ENTRY End = Index;
 
     do {
         if (Index->BaseDllName.Length) {

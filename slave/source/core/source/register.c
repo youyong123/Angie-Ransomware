@@ -25,7 +25,7 @@ GetMachineId(
     OBJECT_ATTRIBUTES Object = RTL_CONSTANT_OBJECT_ATTRIBUTES(&DosPath, OBJ_CASE_INSENSITIVE);
 
     /* not sure for MAXIMUM_ALLOWED */
-    if (!NT_SUCCESS(NtOpenKey(&hKey, MAXIMUM_ALLOWED | FILE_READ_ACCESS | FILE_WRITE_ATTRIBUTES, &Object))) {
+    if (NT_ERROR(NtOpenKey(&hKey, MAXIMUM_ALLOWED | FILE_READ_ACCESS | FILE_WRITE_ATTRIBUTES, &Object))) {
         $DLOG1(DLG_FLT_CRITICAL, "Failed to open key \\REGISTRY\\MACHINE\\SOFTWARE\\Microsoft\\Cryptography\\");
 
         return FALSE;
@@ -35,7 +35,7 @@ GetMachineId(
     UNICODE_STRING ValueName = CONST_UNICODE_STRING(L"MachineGuid");
     PKEY_VALUE_FULL_INFORMATION Value = RtlpBufferGetDosBuffer();
 
-    if (!NT_SUCCESS(NtQueryValueKey(hKey, &ValueName, KeyValueFullInformation, Value, MACHINE_GUID_QUERY_SIZE, &dwValueSize)) && dwValueSize == MACHINE_GUID_QUERY_SIZE) {
+    if (NT_ERROR(NtQueryValueKey(hKey, &ValueName, KeyValueFullInformation, Value, MACHINE_GUID_QUERY_SIZE, &dwValueSize)) && dwValueSize == MACHINE_GUID_QUERY_SIZE) {
         $DLOG1(DLG_FLT_CRITICAL, "Failed to query value MachineGuid");
 
         return FALSE;
@@ -145,7 +145,7 @@ RegisterSlave(VOID)
 
     closesocket(ServerSocket);
 
-    $DLOG1(DLG_FLT_INFO, "Done");
+    $DLOG2(DLG_FLT_INFO, "Done");
 
     return FALSE;
 }

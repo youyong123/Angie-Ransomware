@@ -36,6 +36,9 @@
     <ClCompile Include="source\random.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\setup.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -63,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\random.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\setup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

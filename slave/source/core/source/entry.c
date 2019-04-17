@@ -30,7 +30,7 @@ InitialEntrySplitted(VOID)
     //        break;
     //    }
 
-    //    if (!NT_SUCCESS(NtDelayExecution(FALSE, (PVOID)&qwTimeout))) {
+    //    if (NT_ERROR(NtDelayExecution(FALSE, (PVOID)&qwTimeout))) {
     //        $DLOG1(DLG_FLT_CRITICAL, "NtDelayExecution failed!");
 
     //        return 0;

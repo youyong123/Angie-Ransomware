@@ -1,9 +1,12 @@
 
-c: cx64
-l: lx64
+c: cx64 cx86
+l: lx64 lx86
 
-#Sc: cx86
-#Sl: lx86
+#c: cx64
+#l: lx64
+#
+#c: cx86
+#l: lx86
 
 cx86:
 	$(ICPP_COMPILER_X86) $(CLFL_BASE) $(CLFL_CPU) $(CLFL_OX) $(CLFL_ADDON) /c source/*.c /Fo:$(PROJECT_OBJECT_PATH)/dropper/x86/

@@ -94,12 +94,9 @@ typedef enum _NTVERSION {
 
 #pragma region DROPPER
     #ifdef _AMD64_
-        /*
-            DLOG x64 uses gs:TLS
-            DLOG x86 uses fs:TLS
-        */
-
         #define SCFG_DLOG_DROPPER_X64_THREAD0 L"\\Device\\NamedPipe\\{49E0CB71-B6D5-4501-A508-E7770725CF55}"
+    #else
+        #define SCFG_DROPPER_NTAPI_STUB_X86_USE_WOW64 ON  // OFF (I have Windows 10 x64, can't use x86 stubs without VMX
     #endif
 
     #define SCFG_DROPPER_LDR_PRINT_FOUND_PROC     ON  // OFF
@@ -108,8 +105,14 @@ typedef enum _NTVERSION {
     #define SCFG_DROPPER_NTAPI_INIT_USE_PROCLOAD  OFF // OFF
     #define SCFG_DROPPER_NTAPI_INIT_USE_SYSCALLS  OFF // OFF
 
-    #ifdef _X86_
-        #define SCFG_DROPPER_NTAPI_STUB_X86_USE_WOW64 ON  // OFF (I have Windows 10 x64, can't use x86 stubs without VMX
+    #define SCFG_DROPPER_PROCESSQUERY_INJECT_TO_PHONY    OFF       // OFF
+    #define SCFG_DROPPER_PROCESSQUERY_PRINT_QUERY        ON        // OFF
+    #define SCFG_DROPPER_PROCESSQUERY_TIME_DENOMINATOR   100000000 // 100000000
+    #define SCFG_DROPPER_PROCESSQUERY_TRIES              5         // 5
+    #define SCFG_DROPPER_PROCESSQUERY_TIME_SHIFT_ON_FAIL 5         // 5
+
+    #if !(SCFG_DROPPER_PROCESSQUERY_TIME_DENOMINATOR << (SCFG_DROPPER_PROCESSQUERY_TRIES - 1) * SCFG_DROPPER_PROCESSQUERY_TIME_SHIFT_ON_FAIL)
+        #error Invalid SCFG_DROPPER_PROCESSQUERY_TRIES, SCFG_DROPPER_PROCESSQUERY_TIME_SHIFT_ON_FAIL or SCFG_DROPPER_PROCESSQUERY_TIME_DENOMINATOR
     #endif
 #pragma endregion
 

