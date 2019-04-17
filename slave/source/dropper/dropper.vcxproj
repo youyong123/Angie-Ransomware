@@ -95,6 +95,7 @@
     <ClCompile Include="source\ldr.c" />
     <ClCompile Include="source\ntapi\stubs.c" />
     <ClCompile Include="source\ntapi\syscalls.c" />
+    <ClCompile Include="source\random.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -105,6 +106,7 @@
     <ClInclude Include="include\fnv1a.h" />
     <ClInclude Include="include\ldr.h" />
     <ClInclude Include="include\ntapi.h" />
+    <ClInclude Include="include\random.h" />
     <ClInclude Include="source\ntapi\ntapi.h" />
     <ClInclude Include="source\ntapi\rawsyscalls.h" />
   </ItemGroup>

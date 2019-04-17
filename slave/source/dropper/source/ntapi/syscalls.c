@@ -13,10 +13,11 @@ DWORD NtapiSyscallsNamesHash[] = {
     0x43E32F32 ^ XOR_KEY, // NtWriteVirtualMemory
     0xED0594DA ^ XOR_KEY, // NtCreateThreadEx
     0x5EA49A38 ^ XOR_KEY, // NtOpenProcess
+    0x7A43974A ^ XOR_KEY, // NtQuerySystemInformation
     0xF67464E4 ^ XOR_KEY, // NtWriteFile
     0xA9E25A1D ^ XOR_KEY, // NtReadFile
     0xA9C5B599 ^ XOR_KEY, // NtCreateFile
-    0x7A43974A ^ XOR_KEY  // NtQuerySystemInformation
+    0x117BE69E ^ XOR_KEY  // NtQueryDirectoryFile
 };
 
 FARPROC NtapiSyscallsAddressStorage[] = {
@@ -25,10 +26,11 @@ FARPROC NtapiSyscallsAddressStorage[] = {
     (PVOID)RTLP_LCG_NATIVE, // NtWriteVirtualMemory
     (PVOID)RTLP_LCG_NATIVE, // NtCreateThreadEx
     (PVOID)RTLP_LCG_NATIVE, // NtOpenProcess
+    (PVOID)RTLP_LCG_NATIVE, // NtQuerySystemInformation
     (PVOID)RTLP_LCG_NATIVE, // NtWriteFile
     (PVOID)RTLP_LCG_NATIVE, // NtReadFile
     (PVOID)RTLP_LCG_NATIVE, // NtCreateFile
-    (PVOID)RTLP_LCG_NATIVE  // NtQuerySystemInformation
+    (PVOID)RTLP_LCG_NATIVE  // NtQueryDirectoryFile
 };
 
 CONST ULONG NtapiSyscallsOffset[] = {

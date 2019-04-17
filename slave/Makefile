@@ -40,6 +40,9 @@ link:
 r:
 	start cmd /c "$(PROJECT_BIN_PATH)/$(PROJECT_BUILD)/Slave.exe"
 
+rx:
+	start cmd /c dummyx86.exe
+
 core:
 	$(call CompileModule,source/,core,,)
 

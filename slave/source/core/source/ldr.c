@@ -97,7 +97,7 @@ LdrLoadNtapi(VOID)
 
         if (IS_NULL(hModule = LdrGetModule(NtdllNameSum ^ HASH_NTDLL_KEY))) {
             /* For future versions, you never know */
-            if (IS_NULL(hModule = LdrGetModule(NtdllNameSum ^ HASH_NTDLLALT_KEY))) {
+            if (IS_NULL(hModule = LdrGetModule(NtdllNameSumAlt ^ HASH_NTDLLALT_KEY))) {
                 $DLOG1(DLG_FLT_CRITICAL, "Failed to find ntdll.dll");
 
                 return FALSE;

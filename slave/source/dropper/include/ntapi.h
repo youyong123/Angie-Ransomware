@@ -60,6 +60,15 @@ NtOpenProcess(
 
 NTSTATUS
 NTAPISTUB
+NtQuerySystemInformation(
+    IN  SYSTEM_INFORMATION_CLASS SystemInformationClass,
+    OUT PVOID                    SystemInformation,
+    IN  ULONG                    SystemInformationLength,
+    OUT PULONG                   ReturnLength
+    );
+
+NTSTATUS
+NTAPISTUB
 NtWriteFile(
     IN      HANDLE           FileHandle,
     IN  OPT HANDLE           Event,
@@ -104,11 +113,18 @@ NtCreateFile(
 
 NTSTATUS
 NTAPISTUB
-NtQuerySystemInformation(
-    IN  SYSTEM_INFORMATION_CLASS SystemInformationClass,
-    OUT PVOID                    SystemInformation,
-    IN  ULONG                    SystemInformationLength,
-    OUT PULONG                   ReturnLength
+NtQueryDirectoryFile(
+    IN      HANDLE           FileHandle,
+    IN  OPT HANDLE           Event,
+    IN  OPT PIO_APC_ROUTINE  ApcRoutine,
+    IN  OPT PVOID            ApcContext,
+    OUT     PIO_STATUS_BLOCK IoStatusBlock,
+    OUT     PVOID            FileInformation,
+    IN      ULONG            Length,
+    IN      FILE_INFORMATION_CLASS FileInformationClass,
+    IN      BOOLEAN          ReturnSingleEntry,
+    IN  OPT PUNICODE_STRING  FileMask,
+    IN      BOOLEAN          RestartScan
     );
 
 #endif

