@@ -3,7 +3,7 @@
 #include <fnv1a.h>
 #include <random.h>
 
-#if 
+#if 1
     enum {
         #ifdef _AMD64_
             DummyProcessSum = 0x99A5C4B4, // DummyProcessx64.exe
