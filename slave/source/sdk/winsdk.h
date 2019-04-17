@@ -150,6 +150,8 @@ typedef PVOID32 HANDLE32, *PHANDLE32;
 #define IS_INVALID_HANDLE(X)  ((X) == -1)
 #define NOT_INVALID_HANDLE(X) ((X) != -1)
 
+PRAGMA_WARNING_DISABLE_POP(344)
+
 #define PAGE_SIZE 0x1000
 
 #define NtCurrentProcess() ((HANDLE)(LONG_PTR)-1)
@@ -766,7 +768,7 @@ typedef struct _KEY_VALUE_BASIC_INFORMATION {
     ULONG TitleIndex;
     ULONG Type;
     ULONG NameLength;
-    WCHAR Name[1];
+    WCHAR Name[ANYSIZE_ARRAY];
 } KEY_VALUE_BASIC_INFORMATION, *PKEY_VALUE_BASIC_INFORMATION;
 
 typedef struct _KEY_VALUE_FULL_INFORMATION {
@@ -775,17 +777,62 @@ typedef struct _KEY_VALUE_FULL_INFORMATION {
     ULONG DataOffset;
     ULONG DataLength;
     ULONG NameLength;
-    WCHAR Name[1];
+    WCHAR Name[ANYSIZE_ARRAY];
 } KEY_VALUE_FULL_INFORMATION, *PKEY_VALUE_FULL_INFORMATION;
 
 typedef struct _KEY_VALUE_PARTIAL_INFORMATION {
     ULONG TitleIndex;
     ULONG Type;
     ULONG DataLength;
-    UCHAR Data[1];
+    UCHAR Data[ANYSIZE_ARRAY];
 } KEY_VALUE_PARTIAL_INFORMATION, *PKEY_VALUE_PARTIAL_INFORMATION;
 
+typedef LONG KPRIORITY;
 typedef VOID IO_APC_ROUTINE, *PIO_APC_ROUTINE;
+
+typedef enum _KWAIT_REASON {
+    Executive,
+    FreePage,
+    PageIn,
+    PoolAllocation,
+    DelayExecution,
+    Suspended,
+    UserRequest,
+    WrExecutive,
+    WrFreePage,
+    WrPageIn,
+    WrPoolAllocation,
+    WrDelayExecution,
+    WrSuspended,
+    WrUserRequest,
+    WrSpare0,
+    WrQueue,
+    WrLpcReceive,
+    WrLpcReply,
+    WrVirtualMemory,
+    WrPageOut,
+    WrRendezvous,
+    WrKeyedEvent,
+    WrTerminated,
+    WrProcessInSwap,
+    WrCpuRateControl,
+    WrCalloutStack,
+    WrKernel,
+    WrResource,
+    WrPushLock,
+    WrMutex,
+    WrQuantumEnd,
+    WrDispatchInt,
+    WrPreempted,
+    WrYieldExecution,
+    WrFastMutex,
+    WrGuardedMutex,
+    WrRundown,
+    WrAlertByThreadId,
+    WrDeferredPreempt,
+    WrPhysicalFault,
+    MaximumWaitReason
+} KWAIT_REASON, *PKWAIT_REASON;
 
 /* TODO: cleanup */
 typedef enum _SYSTEM_INFORMATION_CLASS {
@@ -967,6 +1014,59 @@ typedef enum _SYSTEM_INFORMATION_CLASS {
     MaxSystemInfoClass
 } SYSTEM_INFORMATION_CLASS, *PSYSTEM_INFORMATION_CLASS;
 
-PRAGMA_WARNING_DISABLE_POP(344)
+typedef struct _SYSTEM_THREAD_INFORMATION {
+    LARGE_INTEGER KernelTime;
+    LARGE_INTEGER UserTime;
+    LARGE_INTEGER CreateTime;
+    ULONG WaitTime;
+    PVOID StartAddress;
+    CLIENT_ID ClientId;
+    KPRIORITY Priority;
+    LONG  BasePriority;
+    ULONG ContextSwitches;
+    ULONG ThreadState;
+    KWAIT_REASON WaitReason;
+} SYSTEM_THREAD_INFORMATION, *PSYSTEM_THREAD_INFORMATION;
+
+typedef struct _SYSTEM_PROCESS_INFORMATION
+{
+    ULONG NextEntryOffset;
+    ULONG NumberOfThreads;
+    LARGE_INTEGER WorkingSetPrivateSize; // since VISTA
+    ULONG HardFaultCount; // since WIN7
+    ULONG NumberOfThreadsHighWatermark; // since WIN7
+    ULONGLONG CycleTime; // since WIN7
+    LARGE_INTEGER CreateTime;
+    LARGE_INTEGER UserTime;
+    LARGE_INTEGER KernelTime;
+    UNICODE_STRING ImageName;
+    KPRIORITY BasePriority;
+    HANDLE UniqueProcessId;
+    HANDLE InheritedFromUniqueProcessId;
+    ULONG  HandleCount;
+    ULONG  SessionId;
+    ULONG_PTR UniqueProcessKey; // since VISTA (requires SystemExtendedProcessInformation)
+    SIZE_T PeakVirtualSize;
+    SIZE_T VirtualSize;
+    ULONG  PageFaultCount;
+    SIZE_T PeakWorkingSetSize;
+    SIZE_T WorkingSetSize;
+    SIZE_T QuotaPeakPagedPoolUsage;
+    SIZE_T QuotaPagedPoolUsage;
+    SIZE_T QuotaPeakNonPagedPoolUsage;
+    SIZE_T QuotaNonPagedPoolUsage;
+    SIZE_T PagefileUsage;
+    SIZE_T PeakPagefileUsage;
+    SIZE_T PrivatePageCount;
+    LARGE_INTEGER ReadOperationCount;
+    LARGE_INTEGER WriteOperationCount;
+    LARGE_INTEGER OtherOperationCount;
+    LARGE_INTEGER ReadTransferCount;
+    LARGE_INTEGER WriteTransferCount;
+    LARGE_INTEGER OtherTransferCount;
+    SYSTEM_THREAD_INFORMATION Threads[ANYSIZE_ARRAY]; // SystemProcessInformation
+    // SYSTEM_EXTENDED_THREAD_INFORMATION Threads[ANYSIZE_ARRAY]; // SystemExtendedProcessinformation
+    // SYSTEM_EXTENDED_THREAD_INFORMATION + SYSTEM_PROCESS_INFORMATION_EXTENSION // SystemFullProcessInformation
+} SYSTEM_PROCESS_INFORMATION, *PSYSTEM_PROCESS_INFORMATION;
 
 #endif

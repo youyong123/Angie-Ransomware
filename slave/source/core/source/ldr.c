@@ -127,6 +127,10 @@ LdrLoadNtapi(VOID)
 
         PRAGMA_LOOP_UNROLL_N(16)
         for (ULONG_PTR i = 0; i != NtapiSyscallsFunctionsCount; i++) {
+            #if SCFG_CORE_LDR_PRINT_SYSCALLS == ON
+                $DLOG1(DLG_FLT_DEFAULT, "0x%p = % 5lX", &NtapiSyscallsAddressStorage[i], (PVOID)dwSyscallOffset[i]);
+            #endif
+
             NtapiSyscallsAddressStorage[i] = (PVOID)dwSyscallOffset[i];
         }
     }

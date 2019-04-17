@@ -76,7 +76,8 @@ typedef enum _NTVERSION {
     #define SCFG_DLOG_CORE_THREAD0 L"\\Device\\NamedPipe\\{49E0CB71-B6D5-4501-A508-E7770725CF55}"
     #define SCFG_DLOG_CORE_THREAD1 L"\\Device\\NamedPipe\\{49E0CB71-B6D5-4501-A508-E7770725CF55}"
 
-    #define SCFG_CORE_LDR_PRINT_FOUND_PROC    OFF // OFF
+    #define SCFG_CORE_LDR_PRINT_FOUND_PROC    OM  // OFF
+    #define SCFG_CORE_LDR_PRINT_SYSCALLS      ON  // OFF
 
     #define SCFG_CORE_NTAPI_INIT_USE_PROCLOAD OFF // OFF
     #define SCFG_CORE_NTAPI_INIT_USE_SYSCALLS OFF // OFF
@@ -101,12 +102,13 @@ typedef enum _NTVERSION {
         #define SCFG_DLOG_DROPPER_X64_THREAD0 L"\\Device\\NamedPipe\\{49E0CB71-B6D5-4501-A508-E7770725CF55}"
     #endif
 
-    #define SCFG_DROPPER_LDR_PRINT_FOUND_PROC     OFF // OFF
+    #define SCFG_DROPPER_LDR_PRINT_FOUND_PROC     ON  // OFF
+    #define SCFG_DROPPER_LDR_PRINT_SYSCALLS       ON  // OFF
 
     #define SCFG_DROPPER_NTAPI_INIT_USE_PROCLOAD  OFF // OFF
     #define SCFG_DROPPER_NTAPI_INIT_USE_SYSCALLS  OFF // OFF
 
-    #ifdef _X86
+    #ifdef _X86_
         #define SCFG_DROPPER_NTAPI_STUB_X86_USE_WOW64 ON  // OFF (I have Windows 10 x64, can't use x86 stubs without VMX
     #endif
 #pragma endregion

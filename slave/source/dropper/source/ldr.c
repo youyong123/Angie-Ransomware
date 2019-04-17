@@ -122,10 +122,14 @@ LdrLoadNtapi(VOID)
             return FALSE;
         }
     } else {
-        PULONG_PTR dwSyscallOffset = (PVOID)&NtapiSyscallsOffset;
+        PULONG32_PTR dwSyscallOffset = (PULONG32_PTR)&NtapiSyscallsOffset + Config.NtVersion.dwCommonIndex * NtapiSyscallsFunctionsCount;
 
         PRAGMA_LOOP_UNROLL_N(16)
         for (ULONG_PTR i = 0; i != NtapiSyscallsFunctionsCount; i++) {
+            #if SCFG_DROPPER_LDR_PRINT_SYSCALLS == ON
+                $DLOG1(DLG_FLT_DEFAULT, "0x%p = % 5lX", &NtapiSyscallsAddressStorage[i], (PVOID)dwSyscallOffset[i]);
+            #endif
+
             NtapiSyscallsAddressStorage[i] = (PVOID)dwSyscallOffset[i];
         }
     }

