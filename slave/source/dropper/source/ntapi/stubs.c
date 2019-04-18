@@ -94,6 +94,18 @@ NtAllocateVirtualMemory(
 
 NTSTATUS
 NTAPISTUB
+NtFreeVirtualMemory(
+    IN HANDLE  ProcessHandle,
+    IO PVOID  *BaseAddress,
+    IO PSIZE_T RegionSize,
+    IN ULONG   FreeType
+    )
+{
+    NTAPI_STUB_SOURCE(__COUNTER__, 0x10);
+}
+
+NTSTATUS
+NTAPISTUB
 NtWriteVirtualMemory(
     IN      HANDLE  ProcessHandle,
     IN      PVOID   BaseAddress,
@@ -103,6 +115,17 @@ NtWriteVirtualMemory(
     )
 {
     NTAPI_STUB_SOURCE(__COUNTER__, 0x14);
+}
+
+NTSTATUS
+NTAPISTUB
+NtFlushInstructionCache(
+    IN HANDLE ProcessHandle,
+    IN PVOID  BaseAddress,
+    IN ULONG  NumberOfBytesToFlush
+    )
+{
+    NTAPI_STUB_SOURCE(__COUNTER__, 0x0C);
 }
 
 NTSTATUS
@@ -129,7 +152,7 @@ NTAPISTUB
 NtOpenProcess(
     OUT PHANDLE            ProcessHandle,
     IN  ACCESS_MASK        DesiredAccess,
-    NON POBJECT_ATTRIBUTES ObjectAttributes,
+    NON POBJECT_ATTRIBUTES ObjectAttributes, // set ObjectName to NULL, not ObjectAttributes
     IN  PCLIENT_ID         ClientId
     )
 {
@@ -150,20 +173,15 @@ NtQuerySystemInformation(
 
 NTSTATUS
 NTAPISTUB
-NtDeviceIoControlFile(
-    IN  HANDLE           FileHandle,
-    IN  HANDLE           Event,
-    IN  PIO_APC_ROUTINE  ApcRoutine,
-    IN  PVOID            ApcContext,
-    OUT PIO_STATUS_BLOCK IoStatusBlock,
-    IN  ULONG            IoControlCode,
-    IN  PVOID            InputBuffer,
-    IN  ULONG            InputBufferLength,
-    OUT PVOID            OutputBuffer,
-    IN  ULONG            OutputBufferLength
+NtQueryInformationProcess(
+    IN  HANDLE           ProcessHandle,
+    IN  PROCESSINFOCLASS ProcessInformationClass,
+    OUT PVOID            ProcessInformation,
+    IN  ULONG            ProcessInformationLength,
+    OUT PULONG           ReturnLength
     )
 {
-    NTAPI_STUB_SOURCE(__COUNTER__, 0x10);
+    NTAPI_STUB_SOURCE(__COUNTER__, 0x14);
 }
 
 NTSTATUS

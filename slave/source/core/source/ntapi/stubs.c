@@ -56,6 +56,18 @@ NtAllocateVirtualMemory(
 
 NTSTATUS
 NTAPISTUB
+NtFreeVirtualMemory(
+    IN HANDLE  ProcessHandle,
+    IO PVOID  *BaseAddress,
+    IO PSIZE_T RegionSize,
+    IN ULONG   FreeType
+    )
+{
+    NTAPI_STUB_SOURCE(__COUNTER__, 0x10);
+}
+
+NTSTATUS
+NTAPISTUB
 NtCreateThreadEx(
     OUT     HANDLE      hThread,
     IN      ACCESS_MASK DesiredAccess,

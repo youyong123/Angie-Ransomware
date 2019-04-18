@@ -23,7 +23,7 @@ FORCEINLINE
 RtlpGetTeb64(VOID)
 {
     #ifdef _AMD64_
-        return (PTEB64)((ULONG_PTR)__readgsdword(FIELD_OFFSET(NT_TIB64, Self)));
+        return (PTEB64)((ULONG_PTR)__readgsqword(FIELD_OFFSET(NT_TIB64, Self)));
     #else
         enum {
             TebOffset = FIELD_OFFSET(NT_TIB64, Self)

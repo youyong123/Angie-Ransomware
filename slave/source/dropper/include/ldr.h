@@ -11,6 +11,11 @@ BOOL
 LdrLoadNtapi(VOID);
 
 BOOL
+LdrQueryAllFixedVolumesBitmask(
+    OUT PDWORD dwVolumes
+    );
+
+BOOL
 LdrQueryAllProcesses(
     OUT PSYSTEM_PROCESS_INFORMATION* ProcessesList
     );

@@ -59,7 +59,7 @@
     <ClCompile Include="source\aes.c" />
     <ClCompile Include="source\config.c" />
     <ClCompile Include="source\crc32.c" />
-    <ClCompile Include="source\dropper\dropper.c" />
+    <ClCompile Include="source\dropper.c" />
     <ClCompile Include="source\entry.c" />
     <ClCompile Include="source\instance.c" />
     <ClCompile Include="source\ldr.c" />

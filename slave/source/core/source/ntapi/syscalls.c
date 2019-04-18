@@ -1,3 +1,4 @@
+#include "ntapi.h"
 
 #define NTDLL_SYSCALL_WOW64(n, xpwow, vwow, w7wow, w8wow, w81wow, w10wow, w11wow, w12wow, w13wow, w14wow, w15wow, w16wow)
 
@@ -9,6 +10,7 @@ CONST VOLATILE DWORD NtapiSyscallsNamesHashXorKey = XOR_KEY;
 
 DWORD NtapiSyscallsNamesHash[] = {
     0xCA67B978 ^ XOR_KEY, // NtAllocateVirtualMemory
+    0xB51CC567 ^ XOR_KEY, // NtFreeVirtualMemory
     0xED0594DA ^ XOR_KEY, // NtCreateThreadEx
     0x6B372C05 ^ XOR_KEY, // NtClose
     0xB06BF858 ^ XOR_KEY, // NtCreateMutant
@@ -20,6 +22,7 @@ DWORD NtapiSyscallsNamesHash[] = {
 
 FARPROC NtapiSyscallsAddressStorage[] = {
     (PVOID)RTLP_LCG_NATIVE, // NtAllocateVirtualMemory
+    (PVOID)RTLP_LCG_NATIVE, // NtFreeVirtualMemory
     (PVOID)RTLP_LCG_NATIVE, // NtCreateThreadEx
     (PVOID)RTLP_LCG_NATIVE, // NtClose
     (PVOID)RTLP_LCG_NATIVE, // NtCreateMutant
@@ -115,3 +118,10 @@ CONST ULONG NtapiSyscallsOffsetWow64[] = {
     #include "rawsyscalls.h"
     #undef NTDLL_SYSCALL_WOW64
 };
+
+#ifndef __INTELLISENSE__
+    C_ASSERT(sizeof(NtapiSyscallsNamesHash)      == sizeof(*NtapiSyscallsNamesHash     ) * NtapiSyscallsFunctionsCount      );
+    C_ASSERT(sizeof(NtapiSyscallsAddressStorage) == sizeof(*NtapiSyscallsAddressStorage) * NtapiSyscallsFunctionsCount      );
+    C_ASSERT(sizeof(NtapiSyscallsOffsetX86)      == sizeof(*NtapiSyscallsOffsetX86     ) * NtapiSyscallsFunctionsCount  * 10);
+    C_ASSERT(sizeof(NtapiSyscallsOffsetWow64)    == sizeof(*NtapiSyscallsOffsetWow64   ) * NtapiSyscallsFunctionsCount  * 10);
+#endif

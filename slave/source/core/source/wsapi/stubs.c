@@ -109,3 +109,9 @@ GetAddrInfoW(
 }
 
 PRAGMA_WARNING_DISABLE_POP(869)
+
+#ifndef __INTELLISENSE__
+    C_ASSERT(sizeof(WsapiNamesHash)      == sizeof(*WsapiNamesHash)      * WsapiFunctionsCount);
+    C_ASSERT(sizeof(WsapiAddressStorage) == sizeof(*WsapiAddressStorage) * WsapiFunctionsCount);
+#endif
+

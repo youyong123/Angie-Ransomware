@@ -106,7 +106,7 @@ CreateInstance(VOID)
         OBJ_OPENIF
     );
 
-    if (NT_SUCCESS(NtOpenMutant(&InstanceMutantObject, STANDARD_RIGHTS_ALL | FILE_READ_DATA, &Object))) {
+    if (!NT_ERROR(NtOpenMutant(&InstanceMutantObject, STANDARD_RIGHTS_ALL | FILE_READ_DATA, &Object))) {
         $DLOG1(DLG_FLT_ERROR, "Another instance is running");
 
         return FALSE;

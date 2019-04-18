@@ -1,7 +1,7 @@
 #ifndef NTAPI_NTAPI_INCLUDED
 #define NTAPI_NTAPI_INCLUDED
 
-#define NtapiSyscallsFunctionsCount 8
+#define NtapiSyscallsFunctionsCount 9
 
 extern CONST VOLATILE DWORD NtapiSyscallsNamesHashXorKey;
 extern DWORD NtapiSyscallsNamesHash[];
